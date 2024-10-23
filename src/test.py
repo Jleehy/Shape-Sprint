@@ -11,7 +11,7 @@ def main():
     # Pygame setup
     pygame.init() # Initialize Pygame
     infoObject = pygame.display.Info() # Get user's display info
-    screen = pygame.display.set_mode((infoObject.current_h, infoObject.current_w)) # Set window size to user's monitor resolution.
+    screen = pygame.display.set_mode((infoObject.current_w, infoObject.current_h)) # Set window size to user's monitor resolution.
     clock = pygame.time.Clock() # Create a Pygame clock object to track time.
     running = True # Keep track if the program is running.
 
