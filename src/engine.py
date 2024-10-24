@@ -1,12 +1,33 @@
+"""
+engine.py
+Description: Engine class
+Programmers:
+    Steve Gan
+    Sean Hammell
+    Jacob Leehy
+    Mario Simental
+    Matthew Sullivan
+Created: Oct 23, 2024
+Revisions:
+Preconditions:
+Postconditions:
+Error Conditions:
+Side Effects:
+Invariants:
+Known Faults:
+"""
+
 import sys
 
 import pygame
+
+from keyboard import Keyboard
 
 
 class Engine:
     def __init__(self):
         """
-        Initializes and Engine object.
+        Initializes an Engine object.
         """
         # Initialize pygame.
         pygame.init()
@@ -18,8 +39,8 @@ class Engine:
         # Start with no state.
         self.state = None
 
-        # To Do.
-        self.keyboard = None
+        # Track key presses.
+        self.keyboard = Keyboard()
 
     def run_loop(self):
         """
@@ -34,6 +55,14 @@ class Engine:
                 # Quit if the window is closed.
                 if event.type == pygame.QUIT:
                     sys.exit()
+
+                # Record the KEYDOWN event for the pressed key.
+                if event.type == pygame.KEYDOWN:
+                    self.keyboard.set_key_down(event.key, True)
+
+                # Record the KEYUP event for the released key.
+                if event.type == pygame.KEYUP:
+                    self.keyboard.set_key_down(event.key, False)
 
             # Clear the screen.
             self.screen.fill((64, 64, 64))
