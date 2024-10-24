@@ -5,6 +5,15 @@ from engine import Engine, engine_instance
 from image import Image
 from sound_effect import SoundEffect
 
+# 330 is a temporary value for y-coord. Eventually y-coord will be handled by cube and platform collision.
+class CollisionDetector:
+    def check_collision(cube, other):
+        if isinstance(other, Ground):
+            return cube.getypos() >= 330
+        elif isinstance(other, Spikes):
+            # Implement spike collision logic
+            pass
+        return False
 
 class Cube:
     def __init__(self):
@@ -14,10 +23,8 @@ class Cube:
 
     def move(self, x, y):
         self._x += x
-        self._y += y
-        if self._y > 330:
-            self._y = 330
-
+        self._y = min(self._y + y, 330)
+       
     def draw(self):
         self._image.blit(self._x, self._y)
 
@@ -31,9 +38,11 @@ class Ground:
     def draw(self):
         self._image.blit(0, 450)
 
+class Spikes:
+    def __init__(self):
+        self._image = Image("./assets/spikes.png")
 
-
-
+# Eventually an implemented state will inherit from the abstract state class. 
 class ExampleState:
     def __init__(self):
         self._cube = Cube()
@@ -86,12 +95,10 @@ class ExampleState:
         self._cube.draw()
         self._ground.draw()
 
-
 # Main function.
 def main():
     engine_instance.state = ExampleState()
     engine_instance.run_loop()
-
 
 # Main entry point.
 if __name__ == "__main__":
