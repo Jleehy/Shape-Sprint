@@ -14,6 +14,6 @@ Ensure you have [Git](https://git-scm.com/) and [Python](https://www.python.org/
    ```bash
    git clone https://github.com/Jleehy/Shape-Sprint.git
 
-## Installing Dependicies
+## Installing Dependencies
   ```bash
   pip install -r requirements.txt
