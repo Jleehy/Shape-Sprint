@@ -25,7 +25,7 @@ def set_music(file):
     Sets the music.
     """
     # Load the music file.
-    pygame.mixer.music_load(file)
+    pygame.mixer.music.load(file)
 
 
 def play_music():

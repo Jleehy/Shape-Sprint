@@ -1,6 +1,6 @@
 """
-image.py
-Description: Image class
+sound_effect.py
+Description: SoundEffect class
 Programmers:
     Steve Gan
     Sean Hammell
