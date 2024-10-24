@@ -34,4 +34,4 @@ class Image:
         """
         Draws the Image to the screen.
         """
-        engine_instance.screen.blit(self._image, self._image.get_recT(x=x, y=y))
+        engine_instance.screen.blit(self._image, self._image.get_rect(x=x, y=y))

@@ -37,8 +37,8 @@ class Engine:
         pygame.display.set_caption("Shape Sprint")
         self.screen = pygame.display.set_mode((800, 600), flags=pygame.SCALED, vsync=1)
 
-        # Start with no state.
-        self.state = None
+        # Start with an empty state.
+        self.state = State()
 
         # Track key presses.
         self.keyboard = Keyboard()
@@ -65,10 +65,12 @@ class Engine:
                 if event.type == pygame.KEYUP:
                     self.keyboard.set_key_down(event.key, False)
 
+            # Update the current state.
             self.state.update()
 
-            # Clear the screen.
+            # Draw the current state.
             self.screen.fill((64, 64, 64))
+            self.state.draw()
             pygame.display.flip()
 
             # Cap the FPS at 75.
