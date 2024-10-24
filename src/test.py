@@ -4,6 +4,27 @@ from audio import *
 from engine import Engine, engine_instance
 from image import Image
 from sound_effect import SoundEffect
+class Level:
+    def __init__(self):
+        self._ground = Ground()
+        self._spikes = [Spikes(300, 330)]
+
+    def get_ground(self):
+        return self._ground
+    
+    def get_spikes(self):
+        return self._spikes
+    
+    def draw(self):
+        self._ground.draw()
+        for spike in self._spikes:
+            spike.draw()
+    
+    def check_collisions(self, cube):
+        for spike in self._spikes:
+            if cube._rect.colliderect(spike._rect):
+                return True
+        return False
 
 class Object:
     def __init__(self, image_path, x, y, x_size, y_size):
@@ -23,6 +44,9 @@ class Object:
     def get_size(self):
         return self._x_size, self._y_size
     
+    def update_rect(self):
+        self._rect.topleft = (self._x, self._y)
+    
 class Cube(Object):
     def __init__(self):
         super().__init__("./assets/cube.png", 0, 330, 120, 120)
@@ -30,20 +54,23 @@ class Cube(Object):
     def move(self, x, y):
         self._x += x
         self._y = min(self._y + y, 330)
+        self.update_rect()
 
 class Ground(Object):
     def __init__(self):
         super().__init__("./assets/ground.png", 0, 450, 800, 150)
 
 class Spikes(Object):
-    def __init__(self):
-        super().__init__("./assets/spikes.png", 0, 330, 120, 121) # The asset has an extra width pixel.
+    def __init__(self, x, y):
+        super().__init__("./assets/spikes.png", x, y, 120, 121) # The asset has an extra width pixel.
 
 # Eventually an implemented state will inherit from the abstract state class. 
 class ExampleState:
     def __init__(self):
         self._cube = Cube()
-        self._ground = Ground()
+        self._level = Level()
+        #self._ground = Ground()
+        #self._spike = Spikes()
         self._gravity = 1
         self._jump_strength = -24
         self.is_jumping = False
@@ -88,9 +115,16 @@ class ExampleState:
         if engine_instance.keyboard.is_key_down(pygame.K_p):
             pause_music()
 
+        if self._level.check_collisions(self._cube):
+            print("Game over")
+            exit()
+
+
     def draw(self):
         self._cube.draw()
-        self._ground.draw()
+        self._level.draw()
+        #self._ground.draw()
+        #self._spike.draw()
 
 # Main function.
 def main():
