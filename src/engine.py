@@ -22,6 +22,7 @@ import sys
 import pygame
 
 from keyboard import Keyboard
+from state import State
 
 
 class Engine:
@@ -63,6 +64,8 @@ class Engine:
                 # Record the KEYUP event for the released key.
                 if event.type == pygame.KEYUP:
                     self.keyboard.set_key_down(event.key, False)
+
+            self.state.update()
 
             # Clear the screen.
             self.screen.fill((64, 64, 64))
