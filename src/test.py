@@ -12,6 +12,7 @@ class Object:
         self._y = y
         self._x_size = x_size
         self._y_size = y_size
+        self._rect = pygame.Rect(x, y, x_size, y_size)
 
     def draw(self):
         self._image.blit(self._x, self._y)
@@ -86,7 +87,7 @@ class ExampleState:
 
         if engine_instance.keyboard.is_key_down(pygame.K_p):
             pause_music()
-            
+
     def draw(self):
         self._cube.draw()
         self._ground.draw()
