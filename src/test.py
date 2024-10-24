@@ -5,42 +5,38 @@ from engine import Engine, engine_instance
 from image import Image
 from sound_effect import SoundEffect
 
-# 330 is a temporary value for y-coord. Eventually y-coord will be handled by cube and platform collision.
-class CollisionDetector:
-    def check_collision(cube, other):
-        if isinstance(other, Ground):
-            return cube.getypos() >= 330
-        elif isinstance(other, Spikes):
-            # Implement spike collision logic
-            pass
-        return False
+class Object:
+    def __init__(self, image_path, x, y, x_size, y_size):
+        self._image = Image(image_path)
+        self._x = x
+        self._y = y
+        self._x_size = x_size
+        self._y_size = y_size
 
-class Cube:
+    def draw(self):
+        self._image.blit(self._x, self._y)
+
+    def get_position(self):
+        return self._x, self._y
+
+    def get_size(self):
+        return self._x_size, self._y_size
+    
+class Cube(Object):
     def __init__(self):
-        self._image = Image("./assets/cube.png")
-        self._x = 0
-        self._y = 330
+        super().__init__("./assets/cube.png", 0, 330, 120, 120)
 
     def move(self, x, y):
         self._x += x
         self._y = min(self._y + y, 330)
-       
-    def draw(self):
-        self._image.blit(self._x, self._y)
 
-    def getypos(self):
-        return self._y
-
-class Ground:
+class Ground(Object):
     def __init__(self):
-        self._image = Image("./assets/ground.png")
-    
-    def draw(self):
-        self._image.blit(0, 450)
+        super().__init__("./assets/ground.png", 0, 450, 800, 150)
 
-class Spikes:
+class Spikes(Object):
     def __init__(self):
-        self._image = Image("./assets/spikes.png")
+        super().__init__("./assets/spikes.png", 0, 330, 120, 121) # The asset has an extra width pixel.
 
 # Eventually an implemented state will inherit from the abstract state class. 
 class ExampleState:
@@ -55,10 +51,10 @@ class ExampleState:
         play_music()
 
     def update(self):
-
+        
         if engine_instance.keyboard.is_key_down(pygame.K_UP):
             # Only jump if on the ground
-            if self._cube.getypos() == 330 and not self.is_jumping:
+            if self._cube.get_position()[1] == 330 and not self.is_jumping:
                 self.jump_velocity = self._jump_strength  # Set initial jump velocity
                 self.is_jumping = True
 
@@ -68,7 +64,7 @@ class ExampleState:
             self.jump_velocity += self._gravity  # Gravity gradually increases velocity, simulating a fall
 
             # Stop jumping and reset when we hit the ground
-            if self._cube.getypos() == 330:
+            if self._cube.get_position()[1] == 330:
                 self.is_jumping = False
                 self.jump_velocity = 0  # Reset the velocity for the next jump
   
@@ -90,7 +86,7 @@ class ExampleState:
 
         if engine_instance.keyboard.is_key_down(pygame.K_p):
             pause_music()
-
+            
     def draw(self):
         self._cube.draw()
         self._ground.draw()

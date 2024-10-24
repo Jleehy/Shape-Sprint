@@ -19,7 +19,6 @@ Known Faults:
 
 import pygame
 
-
 def set_music(file):
     """
     Sets the music.
