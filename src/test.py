@@ -77,7 +77,7 @@ class Spikes(Object):
 
 class Level:
     def __init__(self):
-        self._ground = [Ground(0, 450), Ground(-700, 300)]
+        self._ground = [Ground(0, 450), Ground(-700, 300), Ground(-700,-50)]
         self._hazards = [Spikes(300, 330), Spikes(600, 330)]
 
     def get_ground(self):
