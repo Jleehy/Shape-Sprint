@@ -7,28 +7,164 @@ from image import Image
 from sound_effect import SoundEffect
 import time
 
+class Object:
+    def __init__(self, image_path, x, y, width, height):
+        self._image = Image(image_path)
+        self._x = x
+        self._y = y
+        self._width = width
+        self._height = height
+        self._rect = pygame.Rect(x, y, width, height)
+
+    def draw(self):
+        self._image.blit(self._rect.x, self._rect.y)
+
+    # Debug hitbox
+    def draw_rect(self, screen, color=(255, 0, 0)): 
+        pygame.draw.rect(screen, color, self._rect, 2) 
+
+    def get_position(self):
+        return self._x, self._y
+
+    def get_size(self):
+        return self._width, self._height
+    
+class Cube(Object):
+    def __init__(self):
+        super().__init__("./assets/cube.png", 130, 330, 120, 120)
+
+    def move(self, x, y, level):
+        collision_checks = {'top': False, 'bottom': False, 'left': False, 'right': False}
+        collides_with = []
+
+        self._rect.x += x
+        collision_list = level.get_collisions(self)
+
+        # Handle horizontal collisions
+        for obj in collision_list:
+            if x > 0:  # Moving right
+                self._rect.right = obj._rect.left  # Push cube back to the left edge of the object
+                collides_with.append(obj)
+                collision_checks['right'] = True
+            elif x < 0:  # Moving left
+                self._rect.left = obj._rect.right  # Push cube back to the right edge of the object
+                collides_with.append(obj)
+                collision_checks['left'] = True
+
+        self._rect.y += y
+        collision_list = level.get_collisions(self)
+        
+        # Handle vertical collisions
+        for obj in collision_list:
+            if y > 0:  # Falling
+                self._rect.bottom = obj._rect.top  # Snap to the top of the object
+                collides_with.append(obj)
+                collision_checks['bottom'] = True
+            elif y < 0:  # Jumping up
+                self._rect.top = obj._rect.bottom  # Snap to the bottom of the object
+                collides_with.append(obj)
+                collision_checks['top'] = True
+
+        return collision_checks, collides_with
+
+class Ground(Object):
+    def __init__(self, x, y):
+        super().__init__("./assets/ground.png", x, y, 800, 150)
+
+class Spikes(Object):
+    def __init__(self, x, y):
+        super().__init__("./assets/spikes.png", x, y, 120, 121) # The asset has an extra width pixel.
+
 class Level:
     def __init__(self):
-        self._ground = Ground()
-        self._spikes = [Spikes(300, 330)]
+        self._ground = [Ground(0, 450), Ground(-700, 300)]
+        self._hazards = [Spikes(300, 330), Spikes(600, 330)]
 
     def get_ground(self):
         return self._ground
     
-    def get_spikes(self):
-        return self._spikes
+    def get_hazards(self):
+        return self._hazards
     
     def draw(self):
-        self._ground.draw()
-        for spike in self._spikes:
-            spike.draw()
-    
-    def check_collisions(self, cube):
-        for spike in self._spikes:
-            if cube._rect.colliderect(spike._rect):
-                return True
-        return False
-    
+        for ground in self._ground:
+            ground.draw()
+            ground.draw_rect(engine_instance.screen)
+        for hazard in self._hazards:
+            hazard.draw()
+            hazard.draw_rect(engine_instance.screen)
+
+    def get_collisions(self, cube):
+        collision_list = []
+        for ground in self._ground:
+            if cube._rect.colliderect(ground._rect):
+                collision_list.append(ground)
+        for hazard in self._hazards:
+            if cube._rect.colliderect(hazard._rect):
+                collision_list.append(hazard)
+        return collision_list
+
+# Eventually an implemented state will inherit from the abstract state class. 
+class ExampleState:
+    def __init__(self):
+        self._cube = Cube()
+        self._level = Level()
+        self._gravity = 1
+        self._jump_strength = -24
+        self._vertical_velocity = 0
+        self.is_jumping = False
+        self._sound = SoundEffect("./assets/sound.wav")
+        set_music("./assets/music.wav")
+        play_music()
+
+    def update(self):
+        # Reset vertical velocity if the cube is on the ground
+        if not self._level.get_collisions(self._cube):
+            self._vertical_velocity += self._gravity  # Apply gravity when not grounded
+        else:
+            self._vertical_velocity = 0  # Reset velocity when grounded
+
+        if engine_instance.keyboard.is_key_down(pygame.K_UP):
+            if not self.is_jumping:
+                self._vertical_velocity = self._jump_strength  # Set initial jump velocity
+                self.is_jumping = True
+
+        # Move the cube with the current vertical velocity
+        collisions, collides_with = self._cube.move(0, self._vertical_velocity, self._level)
+
+        # Stop jumping and reset when we hit the ground
+        if collisions['bottom']:
+            self.is_jumping = False
+            self._vertical_velocity = 0  # Reset velocity for the next jump
+
+        '''
+        if engine_instance.keyboard.is_key_down(pygame.K_DOWN):
+            self._cube.move(0, 5, self._level)'''
+
+        if engine_instance.keyboard.is_key_down(pygame.K_LEFT):
+            collisions, collides_with = self._cube.move(-10, 0, self._level)
+
+        if engine_instance.keyboard.is_key_down(pygame.K_RIGHT):
+            collisions, collides_with = self._cube.move(10, 0, self._level)
+
+        if engine_instance.keyboard.is_key_down(pygame.K_s):
+            self._sound.play()
+
+        if engine_instance.keyboard.is_key_down(pygame.K_m):
+            unpause_music()
+
+        if engine_instance.keyboard.is_key_down(pygame.K_p):
+            pause_music()
+
+        for obj in collides_with:
+            if isinstance(obj, Spikes):
+                engine_instance.state = GameOverState(self._level, self._cube)
+
+    def draw(self):
+        self._cube.draw()
+        self._cube.draw_rect(engine_instance.screen)
+        self._level.draw()
+
 class GameOverState:
     def __init__(self, level, cube):
         # Store references to the current level and cube to render the background
@@ -80,106 +216,6 @@ class GameOverState:
         engine_instance.screen.blit(quit_surface, (250, 350))
 
         pygame.display.flip()
-
-class Object:
-    def __init__(self, image_path, x, y, x_size, y_size):
-        self._image = Image(image_path)
-        self._x = x
-        self._y = y
-        self._x_size = x_size
-        self._y_size = y_size
-        self._rect = pygame.Rect(x, y, x_size, y_size)
-
-    def draw(self):
-        self._image.blit(self._x, self._y)
-
-    def get_position(self):
-        return self._x, self._y
-
-    def get_size(self):
-        return self._x_size, self._y_size
-    
-    def update_rect(self):
-        self._rect.topleft = (self._x, self._y)
-    
-class Cube(Object):
-    def __init__(self):
-        super().__init__("./assets/cube.png", 0, 330, 120, 120)
-
-    def move(self, x, y):
-        self._x += x
-        self._y = min(self._y + y, 330)
-        self.update_rect()
-
-class Ground(Object):
-    def __init__(self):
-        super().__init__("./assets/ground.png", 0, 450, 800, 150)
-
-class Spikes(Object):
-    def __init__(self, x, y):
-        super().__init__("./assets/spikes.png", x, y, 120, 121) # The asset has an extra width pixel.
-
-# Eventually an implemented state will inherit from the abstract state class. 
-class ExampleState:
-    def __init__(self):
-        self._cube = Cube()
-        self._level = Level()
-        #self._ground = Ground()
-        #self._spike = Spikes()
-        self._gravity = 1
-        self._jump_strength = -24
-        self.is_jumping = False
-        self._sound = SoundEffect("./assets/sound.wav")
-        set_music("./assets/music.wav")
-        play_music()
-
-    def update(self):
-        
-        if engine_instance.keyboard.is_key_down(pygame.K_UP):
-            # Only jump if on the ground
-            if self._cube.get_position()[1] == 330 and not self.is_jumping:
-                self.jump_velocity = self._jump_strength  # Set initial jump velocity
-                self.is_jumping = True
-
-        # Apply jump and gravity logic
-        if self.is_jumping:
-            self._cube.move(0, self.jump_velocity)
-            self.jump_velocity += self._gravity  # Gravity gradually increases velocity, simulating a fall
-
-            # Stop jumping and reset when we hit the ground
-            if self._cube.get_position()[1] == 330:
-                self.is_jumping = False
-                self.jump_velocity = 0  # Reset the velocity for the next jump
-  
-        '''
-        if engine_instance.keyboard.is_key_down(pygame.K_DOWN):
-            self._cube.move(0, 5)'''
-
-        if engine_instance.keyboard.is_key_down(pygame.K_LEFT):
-            self._cube.move(-10, 0)
-
-        if engine_instance.keyboard.is_key_down(pygame.K_RIGHT):
-            self._cube.move(10, 0)
-
-        if engine_instance.keyboard.is_key_down(pygame.K_s):
-            self._sound.play()
-
-        if engine_instance.keyboard.is_key_down(pygame.K_m):
-            unpause_music()
-
-        if engine_instance.keyboard.is_key_down(pygame.K_p):
-            pause_music()
-
-        if self._level.check_collisions(self._cube):
-            # Transition to game over state on collision
-            engine_instance.state = GameOverState(self._level, self._cube)
-
-
-    def draw(self):
-        self._cube.draw()
-        self._level.draw()
-        #self._ground.draw()
-        #self._spike.draw()
 
 # Main function.
 def main():
