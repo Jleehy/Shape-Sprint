@@ -112,10 +112,14 @@ class ExampleState:
         self._gravity = 1
         self._jump_strength = -24
         self._vertical_velocity = 0
-        self.is_jumping = False
         self._sound = SoundEffect("./assets/sound.wav")
         set_music("./assets/music.wav")
         play_music()
+
+        # Initialize movement flags
+        self.moving_left = False
+        self.moving_right = False
+        self.is_jumping = False
 
     def update(self):
         # Reset vertical velocity if the cube is on the ground
@@ -124,28 +128,29 @@ class ExampleState:
         else:
             self._vertical_velocity = 0  # Reset velocity when grounded
 
+        # Update movement flags based on key states
+        self.moving_left = engine_instance.keyboard.is_key_down(pygame.K_LEFT)
+        self.moving_right = engine_instance.keyboard.is_key_down(pygame.K_RIGHT)
+
         if engine_instance.keyboard.is_key_down(pygame.K_UP):
             if not self.is_jumping:
                 self._vertical_velocity = self._jump_strength  # Set initial jump velocity
                 self.is_jumping = True
 
+        # Determine the horizontal movement based on flags
+        horizontal_movement = 0
+        if self.moving_left:
+            horizontal_movement = -10
+        elif self.moving_right:
+            horizontal_movement = 10
+
         # Move the cube with the current vertical velocity
-        collisions, collides_with = self._cube.move(0, self._vertical_velocity, self._level)
+        collisions, collides_with = self._cube.move(horizontal_movement, self._vertical_velocity, self._level)
 
         # Stop jumping and reset when we hit the ground
         if collisions['bottom']:
             self.is_jumping = False
             self._vertical_velocity = 0  # Reset velocity for the next jump
-
-        '''
-        if engine_instance.keyboard.is_key_down(pygame.K_DOWN):
-            self._cube.move(0, 5, self._level)'''
-
-        if engine_instance.keyboard.is_key_down(pygame.K_LEFT):
-            collisions, collides_with = self._cube.move(-10, 0, self._level)
-
-        if engine_instance.keyboard.is_key_down(pygame.K_RIGHT):
-            collisions, collides_with = self._cube.move(10, 0, self._level)
 
         if engine_instance.keyboard.is_key_down(pygame.K_s):
             self._sound.play()
