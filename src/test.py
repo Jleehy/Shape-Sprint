@@ -11,6 +11,7 @@ Programmers:
 Created:
     Oct 23, 2024
 Revisions:
+    Oct 27, 2024: Cleaned up comments - Sean Hammell
 Preconditions:
 Postconditions:
 Error Conditions:
