@@ -24,6 +24,8 @@ from image import Image # Imports the Image class for handling images.
 from sound_effect import SoundEffect # Imports the SoundEffect class for handling sound effects.
 import time # Imports the time module for handling delays.
 
+
+
 # An Object is a visual entity within the game, which encapsulates image rendering and position handling.
 class Object:
     # Initializes an Object given: image_path, position, and size.
@@ -34,6 +36,10 @@ class Object:
         self._width = width # Store the width (pixels) of the object.
         self._height = height # Store the height (pixels) of the object.
         self._rect = pygame.Rect(x, y, width, height) # Store the hitbox of the object.
+        
+        self._counter = 0
+        self._acceleration = 0
+        
 
     # Draws the object image at the position defined by its hitbox.
     def draw(self):
@@ -51,8 +57,15 @@ class Object:
     def get_size(self):
         return self._width, self._height
 
-    def moveObject(self, ammount):
-        self._rect.x -= ammount + 5
+    def moveObject(self, amount):
+        self._counter += 1
+        if self._counter == 75:
+            self._counter = 0
+            self._acceleration += 3
+
+        self._rect.x -= amount + 5 + self._acceleration
+
+
     
     def moveX(self, shiftAmmount):
         self._rect.x -= shiftAmmount
@@ -110,6 +123,11 @@ class Ground(Object):
     def __init__(self, x, y):
         super().__init__("./assets/ground.png", x, y, 800, 150)
 
+class Ground2(Object):
+    # Initializes Ground with the image path, size and position.
+    def __init__(self, x, y):
+        super().__init__("./assets/ground2.png", x, y, 200, 25)
+
 class EndFlag(Object):
     def __init__(self, x, y):
         super().__init__("./assets/end.png", x, y, 60, 20)
@@ -130,8 +148,8 @@ class Spikes(Object):
 class Level:
     # Initializes Level with predefined ground and hazard positions.
     def __init__(self, startingX):
-        self._ground = [Ground(0, 450), Ground(-700, 300), Ground(-700,-50), Ground(800, 450), Ground(1600, 450), Ground(2400, 450), CheckpointFlag(1150, 330), EndFlag(2700, 330)] # Ground tiles list.
-        self._hazards = [Spikes(600, 330), Spikes(1700, 330), Spikes(2200, 330)] # Hazard tiles list.
+        self._ground = [Ground(0, 450), Ground(-700, 300), Ground(-700,-50), Ground(800, 450), Ground(1600, 450), Ground(2400, 450), Ground(3200, 450), Ground(4000, 450), Ground(4800, 450), Ground2(3300, 250), Ground2(3500, 250), CheckpointFlag(3440, 130), EndFlag(5200, 330)] # Ground tiles list.
+        self._hazards = [Spikes(600, 330), Spikes(1700, 330), Spikes(3440, 330), Spikes(3800, 330)] # Hazard tiles list.
         for obj in self._ground + self._hazards:
             obj.moveX(startingX)
     
@@ -184,9 +202,18 @@ class ExampleState:
         self.moving_left = False # Flag if Cube is currently moving left.
         self.moving_right = False # Flag if Cube is currently moving right.
         self.is_jumping = False # Flag if Cube is currently jumping.
+
+
     
+    # Function to update speed text when the speed or acceleration changes
+    def update_speed_text(self, amount):
+        self.speed_text_surface = self.font.render(
+            f"Current Speed: {amount + 5 + self._acceleration}", True, (255, 255, 255)
+        )
+
     # Updates Cube position and handles input for movement and sound control.
     def update(self):
+        
         # Reset vertical velocity if the cube is on the ground
         if (not self._level.get_collisions(self._cube)) or all((isinstance(obj, EndFlag) or isinstance(obj, CheckpointFlag)) for obj in self._level.get_collisions(self._cube)): #this is a long complicated line of code.... checks if no collosions or if all colisions are either EndFlag or CheckpointFlag types
             self._vertical_velocity += self._gravity  # Apply gravity when not grounded
@@ -196,6 +223,7 @@ class ExampleState:
         # Update movement flags based on key states
         self.moving_left = engine_instance.keyboard.is_key_down(pygame.K_LEFT)
         self.moving_right = engine_instance.keyboard.is_key_down(pygame.K_RIGHT)
+
 
         if engine_instance.keyboard.is_key_down(pygame.K_UP):
             if not self.is_jumping:
