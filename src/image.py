@@ -1,20 +1,31 @@
 """
 image.py
-Description: Image class
+Description:
+    Provides a wrapper around a pygame.image object.
 Programmers:
     Steve Gan
     Sean Hammell
     Jacob Leehy
     Mario Simental
     Matthew Sullivan
-Created: Oct 23, 2024
+Created:
+    Oct 23, 2024
 Revisions:
+    Oct 27, 2024: Finalized prologue comments - Sean Hammell
 Preconditions:
+    The Pygame library is initialized.
+    The file passed to the constructor is a valid image file
+        (https://www.pygame.org/docs/ref/image.html)
 Postconditions:
+    An image is available to draw to the screen.
 Error Conditions:
+    __init__ will raise an exception if the image file is invalid or missing.
 Side Effects:
+    None.
 Invariants:
+    None.
 Known Faults:
+    None.
 """
 
 import pygame
