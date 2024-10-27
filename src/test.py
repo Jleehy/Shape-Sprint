@@ -16,7 +16,7 @@ Side Effects:
 Invariants:
 Known Faults:
 """
-
+import pygame
 import sys # Imports system-specific parameters and functions.
 from audio import * # Imports audio-related functions.
 from engine import Engine, engine_instance # Imports the Engine class and a singleton instance.
@@ -169,6 +169,56 @@ class Level:
                 collision_list.append(hazard) # Add it to the collision list if it does collide.
         return collision_list # Returns the list of objects colliding with the Cube.
 
+class MainMenuState:
+    def __init__(self, previous_state):
+        self.font_large = pygame.font.SysFont(None, 72)
+        self.font_small = pygame.font.SysFont(None, 36)
+        self.selected_option = 0  # 0 = Continue, 1 = Restart, 2 = Quit
+        self.previous_state = previous_state  # Store the game state to resume later
+
+        self.last_key_time = 0
+        self.key_delay = 0.2
+
+    def update(self):
+        current_time = time.time()
+        if current_time - self.last_key_time > self.key_delay:
+            if engine_instance.keyboard.is_key_down(pygame.K_DOWN):
+                self.selected_option = (self.selected_option + 1) % 3
+                self.last_key_time = current_time
+
+            if engine_instance.keyboard.is_key_down(pygame.K_UP):
+                self.selected_option = (self.selected_option - 1) % 3
+                self.last_key_time = current_time
+
+            if engine_instance.keyboard.is_key_down(pygame.K_RETURN):
+                if self.selected_option == 0:  # Continue
+                    engine_instance.state = self.previous_state
+                elif self.selected_option == 1:  # Restart
+                    engine_instance.state = ExampleState()  # Start a new game
+                elif self.selected_option == 2:  # Quit
+                    sys.exit()
+
+    def draw(self):
+        engine_instance.screen.fill((0, 0, 0))  # Clear screen for the menu
+        menu_surface = self.font_large.render("Main Menu", True, (255, 255, 255))
+        engine_instance.screen.blit(menu_surface, (200, 150))
+
+        # Menu options
+        continue_color = (255, 255, 0) if self.selected_option == 0 else (255, 255, 255)
+        restart_color = (255, 255, 0) if self.selected_option == 1 else (255, 255, 255)
+        quit_color = (255, 255, 0) if self.selected_option == 2 else (255, 255, 255)
+
+        continue_surface = self.font_small.render("Continue", True, continue_color)
+        restart_surface = self.font_small.render("Restart", True, restart_color)
+        quit_surface = self.font_small.render("Quit", True, quit_color)
+
+        engine_instance.screen.blit(continue_surface, (250, 250))
+        engine_instance.screen.blit(restart_surface, (250, 300))
+        engine_instance.screen.blit(quit_surface, (250, 350))
+
+        pygame.display.flip()
+
+
 # ExampleState manages the main gameplay, handling Cube movement, collisions, and rendering.
 class ExampleState:
     # Initializes ExampleState, setting up Cube, Level, and other parameters.
@@ -193,15 +243,18 @@ class ExampleState:
         self.moving_right = False # Flag if Cube is currently moving right.
         self.is_jumping = False # Flag if Cube is currently jumping.
 
-    # Function to update speed text when the speed or acceleration changes
-    def update_speed_text(self, amount):
-        self.speed_text_surface = self.font.render(
-            f"Current Speed: {amount + 5 + self._acceleration}", True, (255, 255, 255)
-        )
+        # Load instructions asset
+        self._instructions_image = Image("./assets/instructions.png")
+        self._settings = Image("./assets/settings.png")
+
+
 
     # Updates Cube position and handles input for movement and sound control.
     def update(self):
         
+        if engine_instance.keyboard.is_key_down(pygame.K_ESCAPE):
+            engine_instance.state = MainMenuState(self)
+
         # Reset vertical velocity if the cube is on the ground
         if (not self._level.get_collisions(self._cube)) or all((isinstance(obj, EndFlag) or isinstance(obj, CheckpointFlag)) for obj in self._level.get_collisions(self._cube)): #this is a long complicated line of code.... checks if no collosions or if all colisions are either EndFlag or CheckpointFlag types
             self._vertical_velocity += self._gravity  # Apply gravity when not grounded
@@ -250,8 +303,11 @@ class ExampleState:
                 engine_instance.state = GameOverState(self._level, self._cube, self._startpoint, 0)
                 
     def draw(self):
+        self._instructions_image.blit(10, 10)  # Adjust the x, y position as needed
+        self._settings.blit(700, 10)  # Adjust the x, y position as needed
         self._cube.draw()
         self._level.draw()
+
 
 class GameOverState:
     def __init__(self, level, cube, startpoint, endstate):
