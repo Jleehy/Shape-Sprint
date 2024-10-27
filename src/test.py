@@ -1,7 +1,7 @@
 """
 test.py
 Description:
-    Serves as a testing ground for unfinished game features.
+    Serves as a testing ground for the initial implementation.
 Programmers:
     Steve Gan
     Sean Hammell
@@ -20,7 +20,9 @@ Postconditions:
 Error Conditions:
 Side Effects:
 Invariants:
-Known Faults:
+Known Faults: 
+    It's possible to jump over the game end flag and fall offscreen
+    It's possible to push the cube sprite slightly out of its' locked position.
 """
 
 import sys   # Import system-specific parameters and functions.
