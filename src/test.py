@@ -10,7 +10,10 @@ Programmers:
     Matthew Sullivan
 Created:
     Oct 23, 2024
-Revisions:
+Revisions: 
+    Oct 24, 2024: Add jumping, gravity, and some ground logic - Jacob Leehy
+    Oct 26, 2024: Add level progression (scrolling screen) - Jacob Leehy
+    Oct 27, 2024: Add checkpoints, game end, pause menu, platforms, and instructions - Jacob Leehy
     Oct 27, 2024: Cleaned up comments - Sean Hammell
 Preconditions:
 Postconditions:
