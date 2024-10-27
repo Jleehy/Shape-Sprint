@@ -1,7 +1,10 @@
 """
 test.py
 Description:
-    Serves as a testing ground for the initial implementation.
+    Serves as a testing ground for the initial implementation of a platform-style game with level progression,
+    obstacles, checkpoints, and basic player control mechanics. The game simulates gravity, jumping, 
+    object movement, collision detection, and platform interactions. It provides a main menu, pause functionality, 
+    and level progression with checkpoints and a final end-of-level marker.
 Programmers:
     Steve Gan
     Sean Hammell
@@ -10,19 +13,35 @@ Programmers:
     Matthew Sullivan
 Created:
     Oct 23, 2024
-Revisions: 
-    Oct 24, 2024: Add jumping, gravity, and some ground logic - Jacob Leehy
-    Oct 26, 2024: Add level progression (scrolling screen) - Jacob Leehy
-    Oct 27, 2024: Add checkpoints, game end, pause menu, platforms, and instructions - Jacob Leehy
+Revisions:
+    Oct 24, 2024: Added jumping, gravity, and basic ground logic - Jacob Leehy
+    Oct 26, 2024: Added level progression (scrolling screen) - Jacob Leehy
+    Oct 27, 2024: Added checkpoints, game end, pause menu, platforms, and instructions - Jacob Leehy
     Oct 27, 2024: Cleaned up comments - Sean Hammell
 Preconditions:
+    - Pygame and required custom modules (audio, engine, image, sound_effect) are installed and accessible.
+    - Assets such as images and sound files are located in the specified file paths.
+    - Screen resolution and display settings support the dimensions of game objects.
 Postconditions:
+    - The game loads the main menu and allows for progression through levels.
+    - The player can interact with platforms, checkpoints, and obstacles according to the specified game logic.
+    - The main menu and pause menu are responsive to user input.
 Error Conditions:
+    - Missing assets (images, audio files) could cause load failures or display errors.
+    - Invalid input or out-of-bound interactions may cause unexpected object behavior or freezes.
+    - Collisions may behave unexpectedly if objects are incorrectly positioned.
 Side Effects:
+    - Modifies global game state and transitions between game states (e.g., main menu, pause, play).
+    - Alters the screen buffer and renders images each frame.
+    - Plays background music and sound effects based on game state.
 Invariants:
-Known Faults: 
-    It's possible to jump over the game end flag and fall offscreen
-    It's possible to push the cube sprite slightly out of its' locked position.
+    - The Cube object must remain within level boundaries except when falling off-screen at the game end.
+    - Gravity and jump strength values must be non-zero to ensure continuous vertical movement.
+    - Collision detection with non-flag objects stops vertical velocity, while flag collisions do not.
+    - The main menu selection cycling remains within bounds (0-2).  
+Known Faults:
+    - It’s possible to jump over the end flag and fall off-screen.
+    - The cube sprite may be pushed slightly out of its locked position on rare occasions.
 """
 
 import sys   # Import system-specific parameters and functions.
