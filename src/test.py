@@ -24,8 +24,6 @@ from image import Image # Imports the Image class for handling images.
 from sound_effect import SoundEffect # Imports the SoundEffect class for handling sound effects.
 import time # Imports the time module for handling delays.
 
-
-
 # An Object is a visual entity within the game, which encapsulates image rendering and position handling.
 class Object:
     # Initializes an Object given: image_path, position, and size.
@@ -36,11 +34,9 @@ class Object:
         self._width = width # Store the width (pixels) of the object.
         self._height = height # Store the height (pixels) of the object.
         self._rect = pygame.Rect(x, y, width, height) # Store the hitbox of the object.
-        
         self._counter = 0
         self._acceleration = 0
         
-
     # Draws the object image at the position defined by its hitbox.
     def draw(self):
         self._image.blit(self._rect.x, self._rect.y) 
@@ -64,9 +60,7 @@ class Object:
             self._acceleration += 3
 
         self._rect.x -= amount + 5 + self._acceleration
-
-
-    
+        
     def moveX(self, shiftAmmount):
         self._rect.x -= shiftAmmount
 
@@ -85,7 +79,7 @@ class Cube(Object):
             platform.moveObject(x)
         for hazard in level._hazards:
             hazard.moveObject(x)
-
+            
         collision_list = level.get_collisions(self) # Get objects colliding with Cube after a horizontal movement.
 
         # Handle horizontal collisions.
@@ -98,8 +92,7 @@ class Cube(Object):
                     self._rect.left = obj._rect.right  # Push cube back to the right edge of the object
                     collision_checks['left'] = True # Update left-side collision.
             collides_with.append(obj) # Add object to list of objects the Cube collides with.
-
-
+            
         self._rect.y += y # Update the Cube's vertical position.
         collision_list = level.get_collisions(self) # Get objects colliding with Cube after a vertical movement.
         
@@ -113,8 +106,7 @@ class Cube(Object):
                     self._rect.top = obj._rect.bottom  # Snap to the bottom of the object
                     collision_checks['top'] = True # Update top-side collision.
             collides_with.append(obj) # Add object to list of objects the Cube collides with.
-
-
+            
         return collision_checks, collides_with # Return collision data.
 
 # Ground is an Object which represents a tile platform in the game.
@@ -130,19 +122,17 @@ class Ground2(Object):
 
 class EndFlag(Object):
     def __init__(self, x, y):
-        super().__init__("./assets/end.png", x, y, 60, 20)
+        super().__init__("./assets/end.png", x, y, 60, 120)
 
 class CheckpointFlag(Object):
     def __init__(self, x, y):
         super().__init__("./assets/checkpoint.png", x, y, 60, 120)
 
-
 # Spikes is an Object which represents a tile hazard in the game.
 class Spikes(Object):
     # Initializes Ground with the image path, size and position.
     def __init__(self, x, y):
-        super().__init__("./assets/spikes.png", x, y, 120, 121)
-
+        super().__init__("./assets/spikes.png", x, y, 120, 120)
 
 # Level holds the ground and hazards and manages their rendering and collision checking.
 class Level:
@@ -203,8 +193,6 @@ class ExampleState:
         self.moving_right = False # Flag if Cube is currently moving right.
         self.is_jumping = False # Flag if Cube is currently jumping.
 
-
-    
     # Function to update speed text when the speed or acceleration changes
     def update_speed_text(self, amount):
         self.speed_text_surface = self.font.render(
@@ -223,7 +211,6 @@ class ExampleState:
         # Update movement flags based on key states
         self.moving_left = engine_instance.keyboard.is_key_down(pygame.K_LEFT)
         self.moving_right = engine_instance.keyboard.is_key_down(pygame.K_RIGHT)
-
 
         if engine_instance.keyboard.is_key_down(pygame.K_UP):
             if not self.is_jumping:
@@ -261,9 +248,7 @@ class ExampleState:
                 self._startpoint = [obj._x, obj._y]
             if isinstance(obj, EndFlag):
                 engine_instance.state = GameOverState(self._level, self._cube, self._startpoint, 0)
-
-        
-
+                
     def draw(self):
         self._cube.draw()
         self._level.draw()
