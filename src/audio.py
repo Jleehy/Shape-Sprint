@@ -13,7 +13,7 @@ Created:
 Revisions:
     Oct 27, 2024: Finalized prologue comments - Sean Hammell
 Preconditions:
-    pygame.init() has been called to initialize the Pygame library.
+    The Pygame library is initialized.
     The file passed to set_music is a valid .ogg or .wav file.
 Postconditions:
     The music is available to play, pause, and unpause.
@@ -22,11 +22,11 @@ Error Conditions:
     play_music, pause_music, and unpause_music will raise an exception if there is not
         a valid music file loaded.
 Side Effects:
-    None
+    None.
 Invariants:
     There can never be more than a single music file loaded at a time.
 Known Faults:
-    None
+    None.
 """
 
 import pygame

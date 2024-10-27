@@ -1,20 +1,33 @@
 """
 engine.py
-Description: Engine class
+Description:
+    Serves as the main wrapper for the Pygame library and controls the game loop.
 Programmers:
     Steve Gan
     Sean Hammell
     Jacob Leehy
     Mario Simental
     Matthew Sullivan
-Created: Oct 23, 2024
+Created:
+    Oct 23, 2024
 Revisions:
+    Oct 27, 2024: Finalized prologue comments - Sean Hammell
 Preconditions:
+    The Pygame library is available.
+    The Keyboard class is defined.
+    The State class is defined.
 Postconditions:
+    The Pygame library is initialized.
+    The game window is visible.
+    the game loop is running.
 Error Conditions:
+    None.
 Side Effects:
+    The Pygame library is initialized for all modules.
 Invariants:
+    None.
 Known Faults:
+    None.
 """
 
 import sys
