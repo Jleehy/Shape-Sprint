@@ -51,44 +51,56 @@ class Object:
     def get_size(self):
         return self._width, self._height
 
+    def moveObject(self, ammount):
+        self._rect.x -= ammount + 5
+    
+    def moveX(self, shiftAmmount):
+        self._rect.x -= shiftAmmount
+
 # A Cube is an Object which represents the playable entity in the game.
 class Cube(Object):
     # Initializes a Cube with the image path, size and position.
-    def __init__(self):
-        super().__init__("./assets/cube.png", 130, 330, 120, 120)
+    def __init__(self, startY):
+        super().__init__("./assets/cube.png", 130, startY, 120, 120)
 
     # Moves the Cube and handles collisions.
     def move(self, x, y, level):
         collision_checks = {'top': False, 'bottom': False, 'left': False, 'right': False} # Track collisions on each side.
         collides_with = [] # List of objects the Cube collides with.
 
-        self._rect.x += x # Update the Cube's horizontal position.
+        for platform in level._ground:
+            platform.moveObject(x)
+        for hazard in level._hazards:
+            hazard.moveObject(x)
+
         collision_list = level.get_collisions(self) # Get objects colliding with Cube after a horizontal movement.
 
         # Handle horizontal collisions.
         for obj in collision_list:
-            if x > 0:  # Moving right
-                self._rect.right = obj._rect.left  # Push cube back to the left edge of the object
-                collides_with.append(obj) # Add object to list of objects the Cube collides with.
-                collision_checks['right'] = True # Update right-side collision.
-            elif x < 0:  # Moving left
-                self._rect.left = obj._rect.right  # Push cube back to the right edge of the object
-                collides_with.append(obj) # Add object to list of objects the Cube collides with.
-                collision_checks['left'] = True # Update left-side collision.
+            if not (isinstance(obj, CheckpointFlag) or isinstance(obj, EndFlag)):
+                if x > 0:  # Moving right
+                    self._rect.right = obj._rect.left  # Push cube back to the left edge of the object
+                    collision_checks['right'] = True # Update right-side collision.
+                elif x < 0:  # Moving left
+                    self._rect.left = obj._rect.right  # Push cube back to the right edge of the object
+                    collision_checks['left'] = True # Update left-side collision.
+            collides_with.append(obj) # Add object to list of objects the Cube collides with.
+
 
         self._rect.y += y # Update the Cube's vertical position.
         collision_list = level.get_collisions(self) # Get objects colliding with Cube after a vertical movement.
         
         # Handle vertical collisions
         for obj in collision_list:
-            if y > 0:  # Moving down
-                self._rect.bottom = obj._rect.top  # Snap to the top of the object
-                collides_with.append(obj) # Add object to list of objects the Cube collides with.
-                collision_checks['bottom'] = True # Update bottom-side collision.
-            elif y < 0:  # Moving up
-                self._rect.top = obj._rect.bottom  # Snap to the bottom of the object
-                collides_with.append(obj) # Add object to list of objects the Cube collides with.
-                collision_checks['top'] = True # Update top-side collision.
+            if not (isinstance(obj, CheckpointFlag) or isinstance(obj, EndFlag)):
+                if y > 0:  # Moving down
+                    self._rect.bottom = obj._rect.top  # Snap to the top of the object
+                    collision_checks['bottom'] = True # Update bottom-side collision.
+                elif y < 0:  # Moving up
+                    self._rect.top = obj._rect.bottom  # Snap to the bottom of the object
+                    collision_checks['top'] = True # Update top-side collision.
+            collides_with.append(obj) # Add object to list of objects the Cube collides with.
+
 
         return collision_checks, collides_with # Return collision data.
 
@@ -98,18 +110,30 @@ class Ground(Object):
     def __init__(self, x, y):
         super().__init__("./assets/ground.png", x, y, 800, 150)
 
+class EndFlag(Object):
+    def __init__(self, x, y):
+        super().__init__("./assets/end.png", x, y, 60, 20)
+
+class CheckpointFlag(Object):
+    def __init__(self, x, y):
+        super().__init__("./assets/checkpoint.png", x, y, 60, 120)
+
+
 # Spikes is an Object which represents a tile hazard in the game.
 class Spikes(Object):
     # Initializes Ground with the image path, size and position.
     def __init__(self, x, y):
         super().__init__("./assets/spikes.png", x, y, 120, 121)
 
+
 # Level holds the ground and hazards and manages their rendering and collision checking.
 class Level:
     # Initializes Level with predefined ground and hazard positions.
-    def __init__(self):
-        self._ground = [Ground(0, 450), Ground(-700, 300), Ground(-700,-50)] # Ground tiles list.
-        self._hazards = [Spikes(300, 330), Spikes(600, 330)] # Hazard tiles list.
+    def __init__(self, startingX):
+        self._ground = [Ground(0, 450), Ground(-700, 300), Ground(-700,-50), Ground(800, 450), Ground(1600, 450), Ground(2400, 450), CheckpointFlag(1150, 330), EndFlag(2700, 330)] # Ground tiles list.
+        self._hazards = [Spikes(600, 330), Spikes(1700, 330), Spikes(2200, 330)] # Hazard tiles list.
+        for obj in self._ground + self._hazards:
+            obj.moveX(startingX)
     
     # Return a list of the ground objects.
     def get_ground(self):
@@ -140,10 +164,11 @@ class Level:
 # ExampleState manages the main gameplay, handling Cube movement, collisions, and rendering.
 class ExampleState:
     # Initializes ExampleState, setting up Cube, Level, and other parameters.
-    def __init__(self):
+    def __init__(self, startpoint=[130, 330]):
         # Initialize objects.
-        self._cube = Cube() # Store the Cube data.
-        self._level = Level() # Store the Level data.
+        self._startpoint = startpoint
+        self._cube = Cube(startpoint[1]) # Store the Cube data.
+        self._level = Level(startpoint[0] - 130) # Store the Level data.
 
         # Initialize physics.
         self._gravity = 1  # Store the gravity data.
@@ -163,7 +188,7 @@ class ExampleState:
     # Updates Cube position and handles input for movement and sound control.
     def update(self):
         # Reset vertical velocity if the cube is on the ground
-        if not self._level.get_collisions(self._cube):
+        if (not self._level.get_collisions(self._cube)) or all((isinstance(obj, EndFlag) or isinstance(obj, CheckpointFlag)) for obj in self._level.get_collisions(self._cube)): #this is a long complicated line of code.... checks if no collosions or if all colisions are either EndFlag or CheckpointFlag types
             self._vertical_velocity += self._gravity  # Apply gravity when not grounded
         else:
             self._vertical_velocity = 0  # Reset velocity when grounded
@@ -180,7 +205,7 @@ class ExampleState:
         # Determine the horizontal movement based on flags
         horizontal_movement = 0
         if self.moving_left:
-            horizontal_movement = -10
+            horizontal_movement = -3
         elif self.moving_right:
             horizontal_movement = 10
 
@@ -191,7 +216,7 @@ class ExampleState:
         if collisions['bottom']:
             self.is_jumping = False
             self._vertical_velocity = 0  # Reset velocity for the next jump
-
+        '''
         if engine_instance.keyboard.is_key_down(pygame.K_s):
             self._sound.play()
 
@@ -200,23 +225,31 @@ class ExampleState:
 
         if engine_instance.keyboard.is_key_down(pygame.K_p):
             pause_music()
-
+        '''
         for obj in collides_with:
             if isinstance(obj, Spikes):
-                engine_instance.state = GameOverState(self._level, self._cube)
+                engine_instance.state = GameOverState(self._level, self._cube, self._startpoint, 1)
+            if isinstance(obj, CheckpointFlag):
+                self._startpoint = [obj._x, obj._y]
+            if isinstance(obj, EndFlag):
+                engine_instance.state = GameOverState(self._level, self._cube, self._startpoint, 0)
+
+        
 
     def draw(self):
         self._cube.draw()
         self._level.draw()
 
 class GameOverState:
-    def __init__(self, level, cube):
+    def __init__(self, level, cube, startpoint, endstate):
         # Store references to the current level and cube to render the background
         self._level = level
         self._cube = cube
         self.font_large = pygame.font.SysFont(None, 72)
         self.font_small = pygame.font.SysFont(None, 36)
         self.selected_option = 0  # 0 = Restart, 1 = Quit
+        self._startpoint = startpoint
+        self._endstate = endstate
 
         # Prevents the selection from being reset every tick
         self.last_key_time = 0
@@ -236,7 +269,7 @@ class GameOverState:
 
             if engine_instance.keyboard.is_key_down(pygame.K_RETURN):
                 if self.selected_option == 0:  # Restart the game
-                    engine_instance.state = ExampleState()
+                    engine_instance.state = ExampleState(self._startpoint)
                 elif self.selected_option == 1:  # Quit the game
                     sys.exit()
 
@@ -246,8 +279,11 @@ class GameOverState:
         self._cube.draw()
 
         # Game over menu, can be reformatted to match requirements
-        game_over_surface = self.font_large.render("Game Over", True, (255, 0, 0))
-        engine_instance.screen.blit(game_over_surface, (200, 200))
+        if self._endstate == 0:
+            game_result_surface = self.font_large.render("Level Complete", True, (0, 255, 0))
+        elif self._endstate == 1:
+            game_result_surface = self.font_large.render("Game Over", True, (255, 0, 0))
+        engine_instance.screen.blit(game_result_surface, (200, 200))
 
         # Menu options
         restart_color = (255, 255, 0) if self.selected_option == 0 else (255, 255, 255)
