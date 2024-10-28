@@ -17,3 +17,7 @@ Ensure you have [Git](https://git-scm.com/) and [Python](https://www.python.org/
 ## Installing Dependencies
   ```bash
   pip install -r requirements.txt
+
+## Running the program (Currently test is the start point)
+  ```bash
+  python3 test.py
