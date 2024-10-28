@@ -14,7 +14,14 @@ Programmers:
 Created:
     Oct 23, 2024
 Revisions:
+    Oct 23, 2024: Added State class, SoundEffect class, Audio functions, Image class, Keyboard class, and Engine class - Sean Hammell
     Oct 24, 2024: Added jumping, gravity, and basic ground logic - Jacob Leehy
+    Oct 24, 2024: Added game over state and transition on collision - Matthew Sullivan
+    Oct 24, 2024: Added level state and implemented collision detection system - Matthew Sullivan
+    Oct 24, 2024: Added an attribute to Object class for storing a rect object to support collision detection - Mario Simental 
+    Oct 24, 2024: Further abstracted Cube, Ground, and Spike classes by creating an Object base class - Mario Simental 
+    Oct 26, 2024: Added a top ground level for testing collision and movement flags for hazard detection - Mario Simental 
+    Oct 26, 2024: Implemented collision detection between player and objects with clamping based on the object being collided with - Mario Simetnal
     Oct 26, 2024: Added level progression (scrolling screen) - Jacob Leehy
     Oct 27, 2024: Added checkpoints, game end, pause menu, platforms, and instructions - Jacob Leehy
     Oct 27, 2024: Cleaned up comments - Sean Hammell
