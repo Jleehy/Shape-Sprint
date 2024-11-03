@@ -258,6 +258,138 @@ class Level:
                 collision_list.append(object)        # Add it to the collision list.
 
         return collision_list  # Return the collision list.
+    
+class OpeningMenuState:
+    def __init__(self, last_key_time):
+        """Initializes an opening menu state"""
+        self.font_large = pygame.font.SysFont(None, 72)  # Create a large font.
+        self.font_small = pygame.font.SysFont(None, 36)  # Create a small font.
+        self.selected_option = 0                         # Set the selected menu option (0 = Start Game, 1 = Options, 2 = Level Select, 3 = Quit).
+        self.last_key_time = last_key_time               # Record the time of the last key press.
+        self.key_delay = 0.2                             # Delay before accepting key presses.
+
+    def update(self):
+        current_time = time.time()                                     # Record the current time.
+        if current_time - self.last_key_time > self.key_delay:         # If enough time has elapsed since the last key press.
+            if engine_instance.keyboard.is_key_down(pygame.K_DOWN):    # If the down arrow is pressed.
+                self.selected_option = (self.selected_option + 1) % 4  # Cycle down through the menu options.
+                self.last_key_time = current_time                      # Record the time of the key press.
+            elif engine_instance.keyboard.is_key_down(pygame.K_UP):    # If the up arrow is pressed.
+                self.selected_option = (self.selected_option - 1) % 4  # Cycle down through the menu options.
+                self.last_key_time = current_time                      # Record the time of the key press.
+
+            if engine_instance.keyboard.is_key_down(pygame.K_RETURN):  # If the return key is pressed.
+                self.last_key_time = current_time
+                if self.selected_option == 0:                          # If Start Game is selected.
+                    self.last_key_time = current_time
+                    engine_instance.state = ExampleState()             # Start the Game.
+                elif self.selected_option == 1:                        # If Options is selected.
+                    self.last_key_time = current_time
+                    engine_instance.state = OptionsMenuState(self.last_key_time)         # Go to the options menu.
+                elif self.selected_option == 2:                        # If Level select is selected.
+                    self.last_key_time = current_time
+                    engine_instance.state = LevelSelectMenuState(self.last_key_time)     # Go to the level select menu.
+                elif self.selected_option == 3:
+                    self.last_key_time = current_time
+                    sys.exit()
+
+    def draw(self):
+        """Draws the opening menu"""
+        engine_instance.screen.fill((0, 0, 0))                                     # Clear the screen.
+        menu_surface = self.font_large.render("Main Menu", True, (255, 255, 255))  # Create a surface for the menu.
+        engine_instance.screen.blit(menu_surface, (200, 150))                      # Draw the menu.
+
+        # Create the Start Game option.
+        start_color = (255, 255, 0) if self.selected_option == 0 else (255, 255, 255)
+        start_surface = self.font_small.render("Start Game", True, start_color)
+        engine_instance.screen.blit(start_surface, (250, 250))
+
+        # Create the Options menu option.
+        options_color = (255, 255, 0) if self.selected_option == 1 else (255, 255, 255)
+        options_surface = self.font_small.render("Options", True, options_color)
+        engine_instance.screen.blit(options_surface, (250, 300))
+
+        # Create the Level Select option
+        levelS_color = (255, 255, 0) if self.selected_option == 2 else (255, 255, 255)
+        levelS_surface = self.font_small.render("Level Select", True, levelS_color)
+        engine_instance.screen.blit(levelS_surface, (250, 350))
+
+        # Create the Quit option.
+        quit_color = (255, 255, 0) if self.selected_option == 3 else (255, 255, 255)
+        quit_surface = self.font_small.render("Quit", True, quit_color)
+        engine_instance.screen.blit(quit_surface, (250, 400))
+
+class OptionsMenuState:
+    def __init__(self, last_key_time):
+        """Initializes an opening menu state"""
+        self.font_large = pygame.font.SysFont(None, 72)  # Create a large font.
+        self.font_small = pygame.font.SysFont(None, 36)  # Create a small font.
+        self.selected_option = 0                         # Set the selected menu option (0 = Start Game, 1 = Options, 2 = Level Select, 3 = Quit).
+        self.last_key_time = last_key_time               # Record the time of the last key press.
+        self.key_delay = 0.2                             # Delay before accepting key presses.
+
+    def update(self):
+        """updates the options menu"""
+        current_time = time.time()                                     # Record the current time.
+        if current_time - self.last_key_time > self.key_delay:         # If enough time has elapsed since the last key press.
+            if engine_instance.keyboard.is_key_down(pygame.K_DOWN):    # If the down arrow is pressed.
+                self.selected_option = (self.selected_option + 1) % 1  # Cycle down through the menu options.
+                self.last_key_time = current_time                      # Record the time of the key press.
+            elif engine_instance.keyboard.is_key_down(pygame.K_UP):    # If the up arrow is pressed.
+                self.selected_option = (self.selected_option - 1) % 1  # Cycle down through the menu options.
+                self.last_key_time = current_time                      # Record the time of the key press.
+
+            if engine_instance.keyboard.is_key_down(pygame.K_RETURN):  # If the return key is pressed.
+                self.last_key_time = current_time 
+                if self.selected_option == 0:                          # If Back is selected.
+                    engine_instance.state = OpeningMenuState(self.last_key_time)         # Return to opening menu
+
+    def draw(self):
+        """Draws the options menu"""
+        engine_instance.screen.fill((0, 0, 0))                                     # Clear the screen.
+        menu_surface = self.font_large.render("Options", True, (255, 255, 255))  # Create a surface for the menu.
+        engine_instance.screen.blit(menu_surface, (200, 150))                      # Draw the menu.
+
+        # Create the Back option.
+        back_color = (255, 255, 0) if self.selected_option == 0 else (255, 255, 255)
+        back_surface = self.font_small.render("Back", True, back_color)
+        engine_instance.screen.blit(back_surface, (250, 250))
+
+class LevelSelectMenuState:
+    def __init__(self, last_key_time):
+        """Initializes an opening menu state"""
+        self.font_large = pygame.font.SysFont(None, 72)  # Create a large font.
+        self.font_small = pygame.font.SysFont(None, 36)  # Create a small font.
+        self.selected_option = 0                         # Set the selected menu option (0 = Start Game, 1 = Options, 2 = Level Select, 3 = Quit).
+        self.last_key_time = last_key_time                           # Record the time of the last key press.
+        self.key_delay = 0.2                             # Delay before accepting key presses.
+
+    def update(self):
+        """updates the level select menu"""
+        current_time = time.time()                                     # Record the current time.
+        if current_time - self.last_key_time > self.key_delay:         # If enough time has elapsed since the last key press.
+            if engine_instance.keyboard.is_key_down(pygame.K_DOWN):    # If the down arrow is pressed.
+                self.selected_option = (self.selected_option + 1) % 1  # Cycle down through the menu options.
+                self.last_key_time = current_time                      # Record the time of the key press.
+            elif engine_instance.keyboard.is_key_down(pygame.K_UP):    # If the up arrow is pressed.
+                self.selected_option = (self.selected_option - 1) % 1  # Cycle down through the menu options.
+                self.last_key_time = current_time                      # Record the time of the key press.
+
+            if engine_instance.keyboard.is_key_down(pygame.K_RETURN):  # If the return key is pressed.
+                self.last_key_time = current_time 
+                if self.selected_option == 0:                          # If Back is selected.
+                    engine_instance.state = OpeningMenuState(self.last_key_time)         # Return to opening menu
+
+    def draw(self):
+        """Draws the level select menu"""
+        engine_instance.screen.fill((0, 0, 0))                                     # Clear the screen.
+        menu_surface = self.font_large.render("Options", True, (255, 255, 255))  # Create a surface for the menu.
+        engine_instance.screen.blit(menu_surface, (200, 150))                      # Draw the menu.
+
+        # Create the Back option.
+        back_color = (255, 255, 0) if self.selected_option == 0 else (255, 255, 255)
+        back_surface = self.font_small.render("Back", True, back_color)
+        engine_instance.screen.blit(back_surface, (250, 250))
 
 class MainMenuState:
     def __init__(self, previous_state):
@@ -424,11 +556,12 @@ class GameOverState:
                 self.selected_option = (self.selected_option - 1) % 2  # Cycle through the menu options.
                 self.last_key_time = current_time                      # Record the time of the key press.
 
-            if engine_instance.keyboard.is_key_down(pygame.K_RETURN):       # If the return key is pressed.
+            if engine_instance.keyboard.is_key_down(pygame.K_RETURN):
+                self.last_key_time = current_time        # If the return key is pressed.
                 if self.selected_option == 0:                               # If Restart is selected.
                     engine_instance.state = ExampleState(self._startpoint)  # Start a new game.
                 elif self.selected_option == 1:                             # If Quit is selected.
-                    sys.exit()                                              # Exit the game.
+                    engine_instance.state = OpeningMenuState(self.last_key_time)                                              # Exit the game.
 
     def draw(self):
         """
@@ -448,15 +581,15 @@ class GameOverState:
         engine_instance.screen.blit(restart_surface, (250, 300))
 
         # Create the Quit option.
-        quit_color = (255, 255, 0) if self.selected_option == 1 else (255, 255, 255)
-        quit_surface = self.font_small.render("Quit", True, quit_color)
-        engine_instance.screen.blit(quit_surface, (250, 350))
+        menu_color = (255, 255, 0) if self.selected_option == 1 else (255, 255, 255)
+        menu_surface = self.font_small.render("Main Menu", True, menu_color)
+        engine_instance.screen.blit(menu_surface, (250, 350))
 
 def main():
     """
     Sets the initial game state and passes control to the engine.
     """
-    engine_instance.state = ExampleState()  # Set the initial game state.
+    engine_instance.state = OpeningMenuState(0)  # Set the initial game state.
     engine_instance.run_loop()              # Pass control to the engine.
 
 if __name__ == "__main__":
