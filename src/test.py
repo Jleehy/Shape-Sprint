@@ -186,8 +186,8 @@ class Spikes(Object):
 class Level:
     # Initializes Level with predefined ground and hazard positions.
     def __init__(self, startingX):
-        self._ground = [Ground(0, 450), Ground(-700, 300), Ground(-700,-50), Ground(800, 450), Ground(1600, 450), Ground(2400, 450), Ground(3200, 450), Ground(4000, 450), Ground(4800, 450), Ground2(3300, 250), Ground2(3500, 250), CheckpointFlag(3440, 130), EndFlag(5200, 330)] # Ground tiles list.
-        self._hazards = [Spikes(600, 330), Spikes(1700, 330), Spikes(3440, 330), Spikes(3800, 330)] # Hazard tiles list.
+        self._ground = [Ground(0, 900), Ground(-700, 750), Ground(-700,-50), Ground(800, 900), Ground(1600, 900), Ground(2400, 900), Ground(3200, 900), Ground(4000, 900), Ground(4800, 900), Ground2(3300, 750), Ground2(3500, 750), CheckpointFlag(3440, 630), EndFlag(5200, 780)] # Ground tiles list.
+        self._hazards = [Spikes(600, 780), Spikes(1700, 780), Spikes(3440, 780), Spikes(3800, 780)] # Hazard tiles list.
         for obj in self._ground + self._hazards:
             obj.moveX(startingX)
     
@@ -407,7 +407,7 @@ class MainMenuState:
 # ExampleState manages the main gameplay, handling Cube movement, collisions, and rendering.
 class ExampleState:
     # Initializes ExampleState, setting up Cube, Level, and other parameters.
-    def __init__(self, startpoint=[130, 330]):
+    def __init__(self, startpoint=[130, 780]):
         # Initialize objects.
         self._startpoint = startpoint # startpoint var to be used w/ checkpoints
         self._cube = Cube(startpoint[1]) # Store the Cube data.
@@ -489,7 +489,7 @@ class ExampleState:
                 
     def draw(self):
         self._instructions_image.blit(10, 10)  # Adjust the x, y position as needed
-        self._settings.blit(700, 10)  # Adjust the x, y position as needed
+        self._settings.blit(1500, 10)  # Adjust the x, y position as needed
         self._cube.draw() # draw cube
         self._level.draw() # draw level
 
