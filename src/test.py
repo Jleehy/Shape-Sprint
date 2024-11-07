@@ -385,7 +385,7 @@ class MainMenuState:
 
     def draw(self):
         engine_instance.screen.fill((0, 0, 0))  # Clear screen for the menu
-        menu_surface = self.font_large.render("Main Menu", True, (255, 255, 255)) # make surface for menu
+        menu_surface = self.font_large.render("Pause Menu", True, (255, 255, 255)) # make surface for menu
         engine_instance.screen.blit(menu_surface, (200, 150)) # draw menu
 
         # Menu options
