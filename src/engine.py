@@ -48,7 +48,7 @@ class Engine:
 
         # Create an 800x600 window with the title "Shape Sprint".
         pygame.display.set_caption("Shape Sprint")
-        self.screen = pygame.display.set_mode((800, 600), flags=pygame.SCALED, vsync=1)
+        self.screen = pygame.display.set_mode((1600, 1200), flags=pygame.SCALED, vsync=1)
 
         # Start with an empty state.
         self.state = State()
