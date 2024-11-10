@@ -12,6 +12,7 @@ Created:
     Nov 9, 2024
 Revisions:
     Nov 9, 2024: Moved level functionality out of test.py and updated how levels are specified - Sean Hammell
+    Nov 9, 2024: Began implementing level 1 - Sean Hammell
 Preconditions:
 Postconditions:
 Error Conditions:
@@ -59,17 +60,7 @@ class Spikes(Object):
 
 # Tutorial level layout specification.
 level0 = {
-    "ground": [
-        (0, 900),
-        (-700, 750),
-        (-700, -50),
-        (800, 900),
-        (1600, 900),
-        (2400, 900),
-        (3200, 900),
-        (4000, 900),
-        (4800, 900),
-    ],
+    "ground": (0, 4800),
     "platforms": [
         (3300, 750),
         (3500, 750),
@@ -78,14 +69,29 @@ level0 = {
         (3440, 630),
     ],
     "spikes": [
-        (600, 780),
-        (1700, 780),
-        (3440, 780),
-        (3800, 780),
+        (600, 720, 780),
+        (1700, 1820, 780),
+        (3440, 3560, 780),
+        (3800, 3920, 780),
     ],
     "end": (5200, 780),
 }
 
+level1 = {
+    "ground": (0, 20000),
+    "platforms": [
+        (3600, 750),
+        (4600, 600),
+        (5600, 750),
+    ],
+    "checkpoints": [],
+    "spikes": [
+        (1200, 1320, 780),
+        (2400, 2520, 780),
+        (3600, 6000, 780),
+    ],
+    "end": (7200, 780),
+}
 
 class Level:
     """
@@ -98,8 +104,8 @@ class Level:
         self._environment = []  # Create an empty environment list.
         self._hazards = []      # Create an empty hazards list.
 
-        for ground in specs["ground"]:                              # For each position in the ground list.
-            self._environment.append(Ground(ground[0], ground[1]))  # Create a ground tile.
+        for x in range(specs["ground"][0], specs["ground"][1], 120):  # For the range of x positions in the ground list.
+            self._environment.append(Ground(x, 900))                  # Create a ground tile.
 
         for platform in specs["platforms"]:                               # For each position in the platform list.
             self._environment.append(Platform(platform[0], platform[1]))  # Create a platform.
@@ -107,8 +113,9 @@ class Level:
         for checkpoint in specs["checkpoints"]:                                     # For each position in the checkpoint list.
             self._environment.append(CheckpointFlag(checkpoint[0], checkpoint[1]))  # Create a checkpoint flag.
 
-        for spike in specs["spikes"]:                         # For each position in the spikes list.
-            self._hazards.append(Spikes(spike[0], spike[1]))  # Create a set of spikes.
+        for spike in specs["spikes"]:                      # For each position in the spikes list.
+            for x in range(spike[0], spike[1], 120):       # for the range of x positions in the spike set.
+                self._hazards.append(Spikes(x, spike[2]))  # Create a set of spikes.
 
         self._environment.append(EndFlag(specs["end"][0], specs["end"][1]))  # Create the end flag.
 
@@ -127,7 +134,6 @@ class Level:
         """
         return self._hazards
 
-    # Draws all ground and hazard objects on the screen.
     def draw(self):
         """
         Draws all environment and hazard objects.

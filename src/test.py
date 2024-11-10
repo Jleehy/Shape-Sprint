@@ -308,7 +308,7 @@ class ExampleState:
         # Initialize objects.
         self._startpoint = startpoint # startpoint var to be used w/ checkpoints
         self._cube = Cube(startpoint[1]) # Store the Cube data.
-        self._level = Level(level0, startpoint[0] - 130) # Store the Level data.
+        self._level = Level(level1, startpoint[0] - 130) # Store the Level data.
 
         # Initialize physics.
         self._gravity = 1  # Store the gravity data.
