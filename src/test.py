@@ -414,11 +414,11 @@ class GameOverState:
         # Store references to the current level and cube to render the background
         self._level = level # level
         self._cube = cube # cube
-        self.font_large = pygame.font.SysFont(None, 72)   # Create a large font.
-        self.font_small = pygame.font.SysFont(None, 36)   # Create a small font.
-        self.selected_option = 2 if endstate == 0 else 0  # Set the selected menu option (0 = Restart, 1 = Quit, 2 = Continue).
-        self._startpoint = startpoint                     # Set the startpoint.
-        self._endstate = endstate                         # Record the result of the last run.
+        self.font_large = pygame.font.SysFont(None, 72)  # Create a large font.
+        self.font_small = pygame.font.SysFont(None, 36)  # Create a small font.
+        self.selected_option = 2                         # Set the selected menu option (0 = Restart, 1 = Quit, 2 = Continue).
+        self._startpoint = startpoint                    # Set the startpoint.
+        self._endstate = endstate                        # Record the result of the last run.
         
         # Prevents the selection from being reset every tick
         self.last_key_time = 0                           # Record the time of the last key press.
@@ -432,23 +432,24 @@ class GameOverState:
         current_time = time.time() # Record the current time.
         if current_time - self.last_key_time > self.key_delay:         # If enough time has elapsed since the last key press.
             if engine_instance.keyboard.is_key_down(pygame.K_DOWN):    # If the down arrow is pressed.
-                self.selected_option = (self.selected_option + 1)      # Cycle through the menu options.
-                self.selected_option %= 3 if self._endstate == 0 else 2
+                self.selected_option = (self.selected_option + 1) % 3  # Cycle through the menu options.
                 self.last_key_time = current_time                      # Record the time of the key press.
             elif engine_instance.keyboard.is_key_down(pygame.K_UP):    # If the up arrow is pressed.
-                self.selected_option = (self.selected_option - 1)      # Cycle through the menu options.
-                self.selected_option %= 3 if self._endstate == 0 else 2
+                self.selected_option = (self.selected_option - 1) % 3  # Cycle through the menu options.
                 self.last_key_time = current_time                      # Record the time of the key press.
 
             if engine_instance.keyboard.is_key_down(pygame.K_RETURN):
                 self.last_key_time = current_time        # If the return key is pressed.
                 if self.selected_option == 0:                               # If Restart is selected.
-                    engine_instance.state = ExampleState(self._level.id, self._startpoint)  # Start a new game.
+                    engine_instance.state = ExampleState(self._level.id)  # Start a new game.
                 elif self.selected_option == 1:                             # If Quit is selected.
                     engine_instance.state = OpeningMenuState(self.last_key_time)                                              # Exit the game.
                 elif self.selected_option == 2:
                     if self._level.id + 1 in levels:
-                        engine_instance.state = ExampleState(self._level.id + 1)
+                        if self._endstate == 0:
+                            engine_instance.state = ExampleState(self._level.id + 1)
+                        else:
+                            engine_instance.state = ExampleState(self._level.id, self._startpoint)
                     else:
                         engine_instance.state = OpeningMenuState(self.last_key_time)
 
@@ -472,17 +473,13 @@ class GameOverState:
         menu_color = (255, 255, 0) if self.selected_option == 1 else (255, 255, 255)
         menu_surface = self.font_small.render("Main Menu", True, menu_color)
 
-        if self._endstate == 0:
-            # Create the continue option.
-            continue_color = (255, 250, 0) if self.selected_option == 2 else (255, 255, 255)
-            continue_surface = self.font_small.render("Continue", True, continue_color)
+        # Create the continue option.
+        continue_color = (255, 250, 0) if self.selected_option == 2 else (255, 255, 255)
+        continue_surface = self.font_small.render("Continue", True, continue_color)
 
-            engine_instance.screen.blit(continue_surface, (250, 300))
-            engine_instance.screen.blit(restart_surface, (250, 350))
-            engine_instance.screen.blit(menu_surface, (250, 400))
-        elif self._endstate == 1:
-            engine_instance.screen.blit(restart_surface, (250, 300))
-            engine_instance.screen.blit(menu_surface, (250, 350))
+        engine_instance.screen.blit(continue_surface, (250, 300))
+        engine_instance.screen.blit(restart_surface, (250, 350))
+        engine_instance.screen.blit(menu_surface, (250, 400))
 
 def main():
     """
