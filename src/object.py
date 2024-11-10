@@ -70,11 +70,11 @@ class Object:
         Moves the object the specified number of pixels.
         """
         self._counter += 1           # Increment counter.
-        if self._counter == 75:      # If 75 frames have passed.
+        if self._counter == 30:      # If 30 frames have passed.
             self._counter = 0        # Reset frame count.
-            self._acceleration += 3  # Increment acceleration.
+            self._acceleration += 1  # Increment acceleration.
 
-        self._rect.x -= xamount + 5 + self._acceleration  # move the object left.  
+        self._rect.x -= xamount + 10 + self._acceleration  # move the object left.  
         self._rect.y -= yammount
 
         # Update _x and _y to match the new rect position for consistency.

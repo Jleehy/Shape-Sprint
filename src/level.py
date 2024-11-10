@@ -81,10 +81,11 @@ A note on the level specifications:
 
     'end' stores the (x, y) position of the end flag
 """
-'''
+
 # Tutorial level layout specification.
 level0 = {
-    "ground": (0, 4800),
+    "id": 0,
+    "ground": (-240, 10000),
     "platforms": [
         (3300, 750),
         (3500, 750),
@@ -100,12 +101,11 @@ level0 = {
     ],
     "end": (5200, 780),
 }
-'''
-
 
 # Level 1 layout specification.
 level1 = {
-    "ground": (0, 50000),
+    "id": 1,
+    "ground": (-240, 20000),
     "platforms": [
         (3600, 750),
         (4600, 600),
@@ -135,6 +135,7 @@ level1 = {
     ],
     "end": (35000, 780),
 }
+
 '''
 # Level 1 layout specification.
 level2 = {
@@ -169,6 +170,11 @@ level2 = {
     "end": (35000, 780),
 }
 '''
+levels = {
+    0: level0,
+    1: level1,
+}
+
 class Level:
     """
     Levels stores, manages, and checks for collisions with the environment and hazards of the game.
@@ -177,6 +183,7 @@ class Level:
         """
         Initializes the level environment, hazards, and starting position.
         """
+        self.id = specs["id"]   # Record the level ID.
         self._environment = []  # Create an empty environment list.
         self._hazards = []      # Create an empty hazards list.
 
