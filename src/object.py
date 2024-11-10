@@ -65,7 +65,7 @@ class Object:
         """
         return self._width, self._height  # Return size dimensions.
 
-    def move_object(self, amount):
+    def move_object(self, xamount, yammount=0):
         """
         Moves the object the specified number of pixels.
         """
@@ -74,7 +74,12 @@ class Object:
             self._counter = 0        # Reset frame count.
             self._acceleration += 3  # Increment acceleration.
 
-        self._rect.x -= amount + 5 + self._acceleration  # move the object left.
+        self._rect.x -= xamount + 5 + self._acceleration  # move the object left.  
+        self._rect.y -= yammount
+
+        # Update _x and _y to match the new rect position for consistency.
+        self._x = self._rect.x
+        self._y = self._rect.y
         
     def move_x(self, amount):
         """
