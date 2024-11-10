@@ -51,59 +51,17 @@ Known Faults:
     - The cube sprite may be pushed slightly out of its locked position on rare occasions.
     - Restart after completing the level doesn't ignore checkpoints
 """
-import pygame # Import the Pygame library.
-import sys # Imports system-specific parameters and functions.
-from audio import * # Imports audio-related functions.
-from engine import Engine, engine_instance # Imports the Engine class and a singleton instance.
-from image import Image # Imports the Image class for handling images.
-from sound_effect import SoundEffect # Imports the SoundEffect class for handling sound effects.
-import time # Imports the time module for handling delays.
+import pygame  # Import the Pygame library.
+import sys     # Import system-specific parameters and functions.
+import time    # Import the time module for handling delays.
 
-# An Object is a visual entity within the game, which encapsulates image rendering and position handling.
-class Object:
-    # Initializes an Object given: image_path, position, and size.
-    def __init__(self, image_path, x, y, width, height): 
-        self._image = Image(image_path) # Create an Image object given image_path.
-        self._x = x # Store the x position of the object.
-        self._y = y # Store the y position of the object.
-        self._width = width # Store the width (pixels) of the object.
-        self._height = height # Store the height (pixels) of the object.
-        self._rect = pygame.Rect(x, y, width, height) # Store the hitbox of the object.
-        self._counter = 0 # counter to be used in calculating acceleration over time
-        self._acceleration = 0 # value to store the current speed increace from acceleration
-        
-    # Draws the object image at the position defined by its hitbox.
-    def draw(self):
-        self._image.blit(self._rect.x, self._rect.y) #blit the object
+from audio import *                         # Import audio-related functions.
+from engine import Engine, engine_instance  # Import the Engine class and a singleton instance.
+from image import Image                     # Import the Image class for handling images.
+from sound_effect import SoundEffect        # Import the SoundEffect class for handling sound effects.
 
-    # Draws the hitbox rectangle outline.
-    def draw_hitbox(self, screen, color=(255, 0, 0)): 
-        pygame.draw.rect(screen, color, self._rect, 2) # draw the object
-
-    # Returns the position of the object as a tuple (x, y).
-    def get_position(self):
-        return self._x, self._y # return the position components
-
-    # Returns the size of the object as a tuple (width, height).
-    def get_size(self):
-        return self._width, self._height # return size dimensions
-
-    def moveObject(self, amount):
-        """
-        Moves the object the specified number of pixels.
-        """
-        self._counter += 1 #increment counter
-        if self._counter == 75: # if 75 frames have passed
-            self._counter = 0 #reset frame count
-            self._acceleration += 3 #increment acceleration
-
-        self._rect.x -= amount + 5 + self._acceleration # move the object left
-        
-    def moveX(self, shiftAmmount):
-        """
-        Shifts the objects left.
-        """
-        self._rect.x -= shiftAmmount # move x coord
+from level import *        # Import the Level class, level objects, and level specifications.
+from object import Object  # Import the Object class to create game entities.
 
 # A Cube is an Object which represents the playable entity in the game.
 class Cube(Object):
@@ -122,11 +80,11 @@ class Cube(Object):
         collision_checks = {'top': False, 'bottom': False, 'left': False, 'right': False} # Track collisions on each side.
         collides_with = [] # List of objects the Cube collides with.
 
-        for platform in level._ground: #move every object in the ground list
-            platform.moveObject(x) #move each platform
+        for platform in level._environment: #move every object in the environment list
+            platform.move_object(x) #move each platform
 
         for hazard in level._hazards: #move every object in the hazard list
-            hazard.moveObject(x) # move each hazard
+            hazard.move_object(x) # move each hazard
             
         collision_list = level.get_collisions(self) # Get objects colliding with Cube after a horizontal movement.
 
@@ -157,67 +115,6 @@ class Cube(Object):
             
         return collision_checks, collides_with # Return collision data.
 
-# Ground is an Object which represents a tile platform in the game.
-class Ground(Object):
-    # Initializes Ground with the image path, size and position.
-    def __init__(self, x, y):
-        super().__init__("./assets/ground.png", x, y, 800, 150) # super the parameters and set hitbox size
-
-class Ground2(Object): # this is a second ground used to represent platforms
-    # Initializes Ground with the image path, size and position.
-    def __init__(self, x, y):
-        super().__init__("./assets/ground2.png", x, y, 200, 25) # super the parameters and set hitbox size
-
-class EndFlag(Object): # this is a class to represent the end flag
-    def __init__(self, x, y): # def the init with x y params
-        super().__init__("./assets/end.png", x, y, 60, 120) # super the parameters and set hitbox size
-
-class CheckpointFlag(Object): # class to represent checkpoint flags
-    def __init__(self, x, y): # def init w/ x y params
-        super().__init__("./assets/checkpoint.png", x, y, 60, 120) # super the parameters and set hitbox size
-
-# Spikes is an Object which represents a tile hazard in the game.
-class Spikes(Object):
-    # Initializes Ground with the image path, size and position.
-    def __init__(self, x, y):
-        super().__init__("./assets/spikes.png", x, y, 120, 120) # super the parameters and set hitbox size
-
-# Level holds the ground and hazards and manages their rendering and collision checking.
-class Level:
-    # Initializes Level with predefined ground and hazard positions.
-    def __init__(self, startingX):
-        self._ground = [Ground(0, 900), Ground(-700, 750), Ground(-700,-50), Ground(800, 900), Ground(1600, 900), Ground(2400, 900), Ground(3200, 900), Ground(4000, 900), Ground(4800, 900), Ground2(3300, 750), Ground2(3500, 750), CheckpointFlag(3440, 630), EndFlag(5200, 780)] # Ground tiles list.
-        self._hazards = [Spikes(600, 780), Spikes(1700, 780), Spikes(3440, 780), Spikes(3800, 780)] # Hazard tiles list.
-        for obj in self._ground + self._hazards:
-            obj.moveX(startingX)
-    
-    # Return a list of the ground objects.
-    def get_ground(self):
-        return self._ground # return ground
-    
-    # Return a list of the hazard objects.
-    def get_hazards(self):
-        return self._hazards # return hazards
-    
-    # Draws all ground and hazard objects on the screen.
-    def draw(self):
-        for ground in self._ground: # iterate over grounds
-            ground.draw() # draw ground
-        for hazard in self._hazards: # iterate over hazards
-            hazard.draw() # draw hazards
-
-    # Returns a list of objects colliding with the Cube.
-    def get_collisions(self, cube):
-        """
-        Returns a list of objects colliding with the cube.
-        """
-        collision_list = []                          # List of objects colliding with the Cube.
-        for object in self._ground + self._hazards:  # Iterate through every level object.
-            if cube._rect.colliderect(object._rect): # If the object collides with the cube.
-                collision_list.append(object)        # Add it to the collision list.
-
-        return collision_list  # Return the collision list.
-    
 class OpeningMenuState:
     def __init__(self, last_key_time):
         """Initializes an opening menu state"""
@@ -411,7 +308,7 @@ class ExampleState:
         # Initialize objects.
         self._startpoint = startpoint # startpoint var to be used w/ checkpoints
         self._cube = Cube(startpoint[1]) # Store the Cube data.
-        self._level = Level(startpoint[0] - 130) # Store the Level data.
+        self._level = Level(level0, startpoint[0] - 130) # Store the Level data.
 
         # Initialize physics.
         self._gravity = 1  # Store the gravity data.
