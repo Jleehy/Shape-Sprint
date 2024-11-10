@@ -124,6 +124,7 @@ class OpeningMenuState:
         self.selected_option = 0                         # Set the selected menu option (0 = Start Game, 1 = Options, 2 = Level Select, 3 = Quit).
         self.last_key_time = last_key_time               # Record the time of the last key press.
         self.key_delay = 0.2                             # Delay before accepting key presses.
+        self.menu_options = ["Start Game", "Options", "Level Select", "Quit"] # Array which holds all menu options.
         self._background_image = Image("./assets/mainMenuBackground.png")  # Load the background
 
     def update(self):
@@ -140,7 +141,7 @@ class OpeningMenuState:
                 self.last_key_time = current_time
                 if self.selected_option == 0:                          # If Start Game is selected.
                     self.last_key_time = current_time
-                    engine_instance.state = ExampleState()             # Start the Game.
+                    engine_instance.state = GameState()             # Start the Game.
                 elif self.selected_option == 1:                        # If Options is selected.
                     self.last_key_time = current_time
                     engine_instance.state = OptionsMenuState(self.last_key_time)         # Go to the options menu.
@@ -159,25 +160,14 @@ class OpeningMenuState:
         #menu_surface = self.font_large.render("Main Menu", True, (255, 255, 255))  # Create a surface for the menu.
         #engine_instance.screen.blit(menu_surface, (200, 150))                      # Draw the menu.
 
-        # Create the Start Game option.
-        start_color = (255, 255, 0) if self.selected_option == 0 else (255, 255, 255)
-        start_surface = self.font_small.render("Start Game", True, start_color)
-        engine_instance.screen.blit(start_surface, (600, 600))
-
-        # Create the Options menu option.
-        options_color = (255, 255, 0) if self.selected_option == 1 else (255, 255, 255)
-        options_surface = self.font_small.render("Options", True, options_color)
-        engine_instance.screen.blit(options_surface, (600, 700))
-
-        # Create the Level Select option
-        levelS_color = (255, 255, 0) if self.selected_option == 2 else (255, 255, 255)
-        levelS_surface = self.font_small.render("Level Select", True, levelS_color)
-        engine_instance.screen.blit(levelS_surface, (600, 800))
-
-        # Create the Quit option.
-        quit_color = (255, 255, 0) if self.selected_option == 3 else (255, 255, 255)
-        quit_surface = self.font_small.render("Quit", True, quit_color)
-        engine_instance.screen.blit(quit_surface, (600, 900))
+        # Iterate through each option, dynamically setting color and position
+        for index, option in enumerate(self.menu_options):
+            # Set color based on whether the option is selected
+            color = (255, 255, 0) if self.selected_option == index else (255, 255, 255)
+            # Render the text surface with the appropriate color
+            option_surface = self.font_small.render(option, True, color)
+            # Blit the surface to the screen with dynamically calculated y-position
+            engine_instance.screen.blit(option_surface, (600, 600 + index * 100))
 
 class OptionsMenuState:
     def __init__(self, last_key_time):
@@ -287,7 +277,7 @@ class MainMenuState:
                 if self.selected_option == 0:                          # If Continue is selected.
                     engine_instance.state = self.previous_state        # Resume the game.
                 elif self.selected_option == 1:                        # If Restart is selected.
-                    engine_instance.state = ExampleState()             # Start a new game.
+                    engine_instance.state = GameState()             # Start a new game.
                 elif self.selected_option == 2:                        # If Quit is selected.
                     sys.exit()                                         # Exit the game.
 
@@ -312,9 +302,9 @@ class MainMenuState:
         pygame.display.flip() # update screen
 
 
-# ExampleState manages the main gameplay, handling Cube movement, collisions, and rendering.
-class ExampleState:
-    # Initializes ExampleState, setting up Cube, Level, and other parameters.
+# GameState manages the main gameplay, handling Cube movement, collisions, and rendering.
+class GameState:
+    # Initializes GameState, setting up Cube, Level, and other parameters.
     def __init__(self, level_id = 0, startpoint=[130, 780, 0]):
         # Initialize objects.
         self._startpoint = startpoint # startpoint var to be used w/ checkpoints
@@ -448,14 +438,14 @@ class GameOverState:
             if engine_instance.keyboard.is_key_down(pygame.K_RETURN):
                 self.last_key_time = current_time        # If the return key is pressed.
                 if self.selected_option == 0:                               # If Restart is selected.
-                    engine_instance.state = ExampleState(self._level.id)  # Start a new game.
+                    engine_instance.state = GameState(self._level.id)  # Start a new game.
                 elif self.selected_option == 1:                             # If Quit is selected.
                     engine_instance.state = OpeningMenuState(self.last_key_time)                                              # Exit the game.
                 elif self.selected_option == 2:
                     if (self._level.id + 1 in levels) and (self._endstate == 0):
-                        engine_instance.state = ExampleState(self._level.id + 1)
+                        engine_instance.state = GameState(self._level.id + 1)
                     elif (self._endstate == 1):
-                        engine_instance.state = ExampleState(self._level.id, self._startpoint)
+                        engine_instance.state = GameState(self._level.id, self._startpoint)
                     else:
                         engine_instance.state = OpeningMenuState(self.last_key_time)
 
@@ -486,6 +476,7 @@ class GameOverState:
         engine_instance.screen.blit(continue_surface, (250, 300))
         engine_instance.screen.blit(restart_surface, (250, 350))
         engine_instance.screen.blit(menu_surface, (250, 400))
+
 
 def main():
     """
