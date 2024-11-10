@@ -25,7 +25,9 @@ Revisions:
     Oct 26, 2024: Added level progression (scrolling screen) - Jacob Leehy
     Oct 27, 2024: Added checkpoints, game end, pause menu, platforms, and instructions - Jacob Leehy
     Oct 27, 2024: Cleaned up comments - Sean Hammell
+    Nov 2, 2024: Created the opening menu, options menu, and level select menu. Made sure game loads into opening menu. - Steve Gan
     Nov 9, 2024: Split out Level and Object classes to separate files - Sean Hammell
+    Nov 10, 2024: Added volume up and down option to option menu
 Preconditions:
     - Pygame and required custom modules (audio, engine, image, sound_effect) are installed and accessible.
     - Assets such as images and sound files are located in the specified file paths.
@@ -186,16 +188,20 @@ class OptionsMenuState:
         current_time = time.time()                                     # Record the current time.
         if current_time - self.last_key_time > self.key_delay:         # If enough time has elapsed since the last key press.
             if engine_instance.keyboard.is_key_down(pygame.K_DOWN):    # If the down arrow is pressed.
-                self.selected_option = (self.selected_option + 1) % 1  # Cycle down through the menu options.
+                self.selected_option = (self.selected_option + 1) % 3  # Cycle down through the menu options.
                 self.last_key_time = current_time                      # Record the time of the key press.
             elif engine_instance.keyboard.is_key_down(pygame.K_UP):    # If the up arrow is pressed.
-                self.selected_option = (self.selected_option - 1) % 1  # Cycle down through the menu options.
+                self.selected_option = (self.selected_option - 1) % 3  # Cycle down through the menu options.
                 self.last_key_time = current_time                      # Record the time of the key press.
 
             if engine_instance.keyboard.is_key_down(pygame.K_RETURN):  # If the return key is pressed.
                 self.last_key_time = current_time 
                 if self.selected_option == 0:                          # If Back is selected.
                     engine_instance.state = OpeningMenuState(self.last_key_time)         # Return to opening menu
+                elif self.selected_option == 1:                        # If Volume up is selected
+                    volume_up()                                        # Increase the volume
+                elif self.selected_option == 2:                        # If Volume down is selected
+                    volume_down()                                      # Decrease the volume
 
     def draw(self):
         """Draws the options menu"""
@@ -208,6 +214,14 @@ class OptionsMenuState:
         back_color = (255, 255, 0) if self.selected_option == 0 else (255, 255, 255)
         back_surface = self.font_small.render("Back", True, back_color)
         engine_instance.screen.blit(back_surface, (650, 600))
+        # Create the Volume Up Option
+        vUP_color = (255, 255, 0) if self.selected_option == 1 else (255, 255, 255)
+        vUP_surface = self.font_small.render("Volume Up", True, vUP_color)
+        engine_instance.screen.blit(vUP_surface, (650, 700))
+        # Create the Volume Down Option
+        vDown_color = (255, 255, 0) if self.selected_option == 2 else (255, 255, 255)
+        vDown_surface = self.font_small.render("Volume Down", True, vDown_color)
+        engine_instance.screen.blit(vDown_surface, (650, 800))
 
 class LevelSelectMenuState:
     def __init__(self, last_key_time):
@@ -225,16 +239,22 @@ class LevelSelectMenuState:
         current_time = time.time()                                     # Record the current time.
         if current_time - self.last_key_time > self.key_delay:         # If enough time has elapsed since the last key press.
             if engine_instance.keyboard.is_key_down(pygame.K_DOWN):    # If the down arrow is pressed.
-                self.selected_option = (self.selected_option + 1) % 1  # Cycle down through the menu options.
+                self.selected_option = (self.selected_option + 1) % 3  # Cycle down through the menu options.
                 self.last_key_time = current_time                      # Record the time of the key press.
             elif engine_instance.keyboard.is_key_down(pygame.K_UP):    # If the up arrow is pressed.
-                self.selected_option = (self.selected_option - 1) % 1  # Cycle down through the menu options.
+                self.selected_option = (self.selected_option - 1) % 3  # Cycle down through the menu options.
                 self.last_key_time = current_time                      # Record the time of the key press.
 
             if engine_instance.keyboard.is_key_down(pygame.K_RETURN):  # If the return key is pressed.
                 self.last_key_time = current_time 
                 if self.selected_option == 0:                          # If Back is selected.
                     engine_instance.state = OpeningMenuState(self.last_key_time)         # Return to opening menu
+                elif self.selected_option == 1:                        # If Level 1 is selected
+                    self.last_key_time = current_time                  
+                    engine_instance.state = GameState()                # Start game at first level
+                elif self.selected_option == 2:                        # If level 2 is selected
+                    self.last_key_time = current_time
+                    engine_instance.state = GameState(1)               # Start game at second level
 
     def draw(self):
         """Draws the level select menu"""
@@ -247,6 +267,15 @@ class LevelSelectMenuState:
         back_color = (255, 255, 0) if self.selected_option == 0 else (255, 255, 255)
         back_surface = self.font_small.render("Back", True, back_color)
         engine_instance.screen.blit(back_surface, (650, 550))
+        # Create Level One Option
+        level1_color = (255, 255, 0) if self.selected_option == 1 else (255, 255, 255)
+        level1_surface = self.font_small.render("Level 1", True, level1_color)
+        engine_instance.screen.blit(level1_surface, (150, 800))
+
+        #Create Level Two Option
+        level2_color = (255, 255, 0) if self.selected_option == 2 else (255, 255, 255)
+        level2_surface = self.font_small.render("Level 2", True, level2_color)
+        engine_instance.screen.blit(level2_surface, (680, 800))
 
 class MainMenuState:
     def __init__(self, previous_state):

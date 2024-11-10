@@ -12,11 +12,12 @@ Created:
     Oct 23, 2024
 Revisions:
     Oct 27, 2024: Finalized prologue comments - Sean Hammell
+    Nov 10, 2024: Added volume up and volume down - Steve Gan
 Preconditions:
     The Pygame library is initialized.
     The file passed to set_music is a valid .ogg or .wav file.
 Postconditions:
-    The music is available to play, pause, and unpause.
+    The music is available to play, pause, unpause, increase or decrease the volume.
 Error Conditions:
     set_music will raise an exception if the music file is invalid or missing.
     play_music, pause_music, and unpause_music will raise an exception if there is not
@@ -45,6 +46,7 @@ def play_music():
     Begins playing the music.
     """
     pygame.mixer.music.play(-1)
+    pygame.mixer.music.set_volume(.5)
 
 
 def pause_music():
@@ -59,3 +61,10 @@ def unpause_music():
     Unpauses the music.
     """
     pygame.mixer.music.unpause()
+
+
+def volume_up():
+    pygame.mixer.music.set_volume(pygame.mixer.music.get_volume() + .1)
+
+def volume_down():
+    pygame.mixer.music.set_volume(pygame.mixer.music.get_volume() - .1)
