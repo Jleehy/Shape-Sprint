@@ -27,7 +27,7 @@ Revisions:
     Oct 27, 2024: Cleaned up comments - Sean Hammell
     Nov 2, 2024: Created the opening menu, options menu, and level select menu. Made sure game loads into opening menu. - Steve Gan
     Nov 9, 2024: Split out Level and Object classes to separate files - Sean Hammell
-    Nov 10, 2024: Added volume up and down option to option menu
+    Nov 10, 2024: Added volume up and down option to option menu, and implemented level select for first 2 levels - Steve Gan
 Preconditions:
     - Pygame and required custom modules (audio, engine, image, sound_effect) are installed and accessible.
     - Assets such as images and sound files are located in the specified file paths.
