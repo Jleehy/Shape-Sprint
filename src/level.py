@@ -105,7 +105,7 @@ level0 = {
 # Level 1 layout specification.
 level1 = {
     "id": 1,
-    "ground": (-240, 20000),
+    "ground": (-240, 40000),
     "platforms": [
         (3600, 750),
         (4600, 600),
