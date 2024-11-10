@@ -33,6 +33,8 @@ class Object:
         Initializes an Object given the path to an image, a position, and a size.
         """
         self._image = Image(image_path)                # Create an Image object given image_path.
+        self._base_x = x                               # Store the original x position of the object (constant).
+        self._base_y = y                               # Store the original y position of the object (constant).
         self._x = x                                    # Store the x position of the object.
         self._y = y                                    # Store the y position of the object.
         self._width = width                            # Store the width (pixels) of the object.

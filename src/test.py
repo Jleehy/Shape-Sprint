@@ -386,7 +386,6 @@ class ExampleState:
         elif self.moving_right:       # If its moving right.
             horizontal_movement = 10  # Set the horizontal movement to 10.
 
-        print(self._vertical_velocity)
         collisions, collides_with = self._cube.move(horizontal_movement, self._vertical_velocity, self._level)  # Move the cube.
 
         if collisions['bottom']:         # If the cube is colliding with something under it.
@@ -397,10 +396,10 @@ class ExampleState:
             if isinstance(obj, Spikes):                                                              # If it's spikes.
                 engine_instance.state = GameOverState(self._level, self._cube, self._startpoint, 1)  # The user lost.
             if isinstance(obj, CheckpointFlag):                                                      # If it's a checkpoint.
-                self._startpoint = [obj._x, obj._y]                                                  # Update the startpoint.
+                self._startpoint = [obj._base_x, obj._base_y]                                        # Update the startpoint.
             if isinstance(obj, EndFlag):                                                             # If it's an end flag.
                 engine_instance.state = GameOverState(self._level, self._cube, self._startpoint, 0)  # The user won.
-                
+
     def draw(self):
         self._background_image.blit(self._ctr,self._ctr)
         self._ctr -= 1
@@ -449,7 +448,7 @@ class GameOverState:
                     engine_instance.state = OpeningMenuState(self.last_key_time)                                              # Exit the game.
                 elif self.selected_option == 2:
                     if self._level.id + 1 in levels:
-                        engine_instance.state = ExampleState(self._level.id + 1, self._startpoint)
+                        engine_instance.state = ExampleState(self._level.id + 1)
                     else:
                         engine_instance.state = OpeningMenuState(self.last_key_time)
 
