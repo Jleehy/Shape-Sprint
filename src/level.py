@@ -81,7 +81,7 @@ A note on the level specifications:
 
     'end' stores the (x, y) position of the end flag
 """
-
+'''
 # Tutorial level layout specification.
 level0 = {
     "ground": (0, 4800),
@@ -100,24 +100,75 @@ level0 = {
     ],
     "end": (5200, 780),
 }
+'''
+
 
 # Level 1 layout specification.
 level1 = {
-    "ground": (0, 20000),
+    "ground": (0, 50000),
     "platforms": [
         (3600, 750),
         (4600, 600),
         (5600, 750),
+        (8500, 750),
+        (8700, 750),
+        (8900, 750),
+        (10400, 550),
+        (11900, 350),
+
+
+        
     ],
-    "checkpoints": [],
+    "checkpoints": [(18000, 780)],
     "spikes": [
         (1200, 1320, 780),
         (2400, 2520, 780),
         (3600, 5880, 780),
-    ],
-    "end": (7200, 780),
-}
+        (7000, 7120, 780),
+        (8500, 11000, 780),
+        (19000, 19120, 780),
+        (21000, 21120, 780),
+        (25000, 25120, 780),
+        (29000, 29120, 780),
 
+
+    ],
+    "end": (35000, 780),
+}
+'''
+# Level 1 layout specification.
+level2 = {
+    "ground": (0, 50000),
+    "platforms": [
+        (3600, 750),
+        (4600, 600),
+        (5600, 750),
+        (8500, 750),
+        (8700, 750),
+        (8900, 750),
+        (10400, 550),
+        (11900, 350),
+
+
+        
+    ],
+    "checkpoints": [(18000, 780)],
+    "spikes": [
+        (1200, 1320, 780),
+        (2400, 2520, 780),
+        (3600, 5880, 780),
+        (7000, 7120, 780),
+        (8500, 11000, 780),
+        (19000, 19120, 780),
+        (21000, 21120, 780),
+        (25000, 25120, 780),
+        (29000, 29120, 780),
+
+
+    ],
+    "end": (35000, 780),
+}
+'''
 class Level:
     """
     Levels stores, manages, and checks for collisions with the environment and hazards of the game.
