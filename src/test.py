@@ -79,12 +79,6 @@ class Cube(Object):
         """
         collision_checks = {'top': False, 'bottom': False, 'left': False, 'right': False} # Track collisions on each side.
         collides_with = [] # List of objects the Cube collides with.
-
-        for platform in level._environment: #move every object in the environment list
-            platform.move_object(x) #move each platform
-
-        for hazard in level._hazards: #move every object in the hazard list
-            hazard.move_object(x) # move each hazard
             
         collision_list = level.get_collisions(self) # Get objects colliding with Cube after a horizontal movement.
 
@@ -99,7 +93,7 @@ class Cube(Object):
                     collision_checks['left'] = True # Update left-side collision.
             collides_with.append(obj) # Add object to list of objects the Cube collides with.
             
-        self._rect.y += y # Update the Cube's vertical position.
+        #self._rect.y += y # Update the Cube's vertical position.
         collision_list = level.get_collisions(self) # Get objects colliding with Cube after a vertical movement.
         
         # Handle vertical collisions
@@ -108,21 +102,28 @@ class Cube(Object):
                 if y > 0:  # Moving down
                     self._rect.bottom = obj._rect.top  # Snap to the top of the object
                     collision_checks['bottom'] = True # Update bottom-side collision.
-                elif y < 0:  # Moving up
+                elif self._rect.top > obj._rect.top:  # Moving up
                     self._rect.top = obj._rect.bottom  # Snap to the bottom of the object
                     collision_checks['top'] = True # Update top-side collision.
             collides_with.append(obj) # Add object to list of objects the Cube collides with.
-            
+
+        for platform in level._environment: #move every object in the environment list
+            platform.move_object(x, y) #move each platform
+
+        for hazard in level._hazards: #move every object in the hazard list
+            hazard.move_object(x, y) # move each hazard
+
         return collision_checks, collides_with # Return collision data.
 
 class OpeningMenuState:
     def __init__(self, last_key_time):
         """Initializes an opening menu state"""
         self.font_large = pygame.font.SysFont(None, 72)  # Create a large font.
-        self.font_small = pygame.font.SysFont(None, 36)  # Create a small font.
+        self.font_small = pygame.font.SysFont(None, 110)  # Create a small font.
         self.selected_option = 0                         # Set the selected menu option (0 = Start Game, 1 = Options, 2 = Level Select, 3 = Quit).
         self.last_key_time = last_key_time               # Record the time of the last key press.
         self.key_delay = 0.2                             # Delay before accepting key presses.
+        self._background_image = Image("./assets/mainMenuBackground.png")  # Load the background
 
     def update(self):
         current_time = time.time()                                     # Record the current time.
@@ -152,37 +153,42 @@ class OpeningMenuState:
     def draw(self):
         """Draws the opening menu"""
         engine_instance.screen.fill((0, 0, 0))                                     # Clear the screen.
-        menu_surface = self.font_large.render("Main Menu", True, (255, 255, 255))  # Create a surface for the menu.
-        engine_instance.screen.blit(menu_surface, (200, 150))                      # Draw the menu.
+        self._background_image.blit(0,0)
+
+        #menu_surface = self.font_large.render("Main Menu", True, (255, 255, 255))  # Create a surface for the menu.
+        #engine_instance.screen.blit(menu_surface, (200, 150))                      # Draw the menu.
 
         # Create the Start Game option.
         start_color = (255, 255, 0) if self.selected_option == 0 else (255, 255, 255)
         start_surface = self.font_small.render("Start Game", True, start_color)
-        engine_instance.screen.blit(start_surface, (250, 250))
+        engine_instance.screen.blit(start_surface, (600, 600))
 
         # Create the Options menu option.
         options_color = (255, 255, 0) if self.selected_option == 1 else (255, 255, 255)
         options_surface = self.font_small.render("Options", True, options_color)
-        engine_instance.screen.blit(options_surface, (250, 300))
+        engine_instance.screen.blit(options_surface, (600, 700))
 
         # Create the Level Select option
         levelS_color = (255, 255, 0) if self.selected_option == 2 else (255, 255, 255)
         levelS_surface = self.font_small.render("Level Select", True, levelS_color)
-        engine_instance.screen.blit(levelS_surface, (250, 350))
+        engine_instance.screen.blit(levelS_surface, (600, 800))
 
         # Create the Quit option.
         quit_color = (255, 255, 0) if self.selected_option == 3 else (255, 255, 255)
         quit_surface = self.font_small.render("Quit", True, quit_color)
-        engine_instance.screen.blit(quit_surface, (250, 400))
+        engine_instance.screen.blit(quit_surface, (600, 900))
 
 class OptionsMenuState:
     def __init__(self, last_key_time):
         """Initializes an opening menu state"""
         self.font_large = pygame.font.SysFont(None, 72)  # Create a large font.
-        self.font_small = pygame.font.SysFont(None, 36)  # Create a small font.
+        self.font_small = pygame.font.SysFont(None, 110)  # Create a small font.
         self.selected_option = 0                         # Set the selected menu option (0 = Start Game, 1 = Options, 2 = Level Select, 3 = Quit).
         self.last_key_time = last_key_time               # Record the time of the last key press.
         self.key_delay = 0.2                             # Delay before accepting key presses.
+
+        self._background_image = Image("./assets/optionsMenuBackground.png")  # Load the background
+
 
     def update(self):
         """updates the options menu"""
@@ -203,22 +209,25 @@ class OptionsMenuState:
     def draw(self):
         """Draws the options menu"""
         engine_instance.screen.fill((0, 0, 0))                                     # Clear the screen.
-        menu_surface = self.font_large.render("Options", True, (255, 255, 255))  # Create a surface for the menu.
-        engine_instance.screen.blit(menu_surface, (200, 150))                      # Draw the menu.
+        self._background_image.blit(0,0)
+        #menu_surface = self.font_large.render("Options", True, (255, 255, 255))  # Create a surface for the menu.
+        #engine_instance.screen.blit(menu_surface, (200, 150))                      # Draw the menu.
 
         # Create the Back option.
         back_color = (255, 255, 0) if self.selected_option == 0 else (255, 255, 255)
         back_surface = self.font_small.render("Back", True, back_color)
-        engine_instance.screen.blit(back_surface, (250, 250))
+        engine_instance.screen.blit(back_surface, (600, 600))
 
 class LevelSelectMenuState:
     def __init__(self, last_key_time):
         """Initializes an opening menu state"""
         self.font_large = pygame.font.SysFont(None, 72)  # Create a large font.
-        self.font_small = pygame.font.SysFont(None, 36)  # Create a small font.
+        self.font_small = pygame.font.SysFont(None, 110)  # Create a small font.
         self.selected_option = 0                         # Set the selected menu option (0 = Start Game, 1 = Options, 2 = Level Select, 3 = Quit).
         self.last_key_time = last_key_time                           # Record the time of the last key press.
         self.key_delay = 0.2                             # Delay before accepting key presses.
+
+        self._background_image = Image("./assets/levelMenuBackground.png")  # Load the background
 
     def update(self):
         """updates the level select menu"""
@@ -239,13 +248,14 @@ class LevelSelectMenuState:
     def draw(self):
         """Draws the level select menu"""
         engine_instance.screen.fill((0, 0, 0))                                     # Clear the screen.
-        menu_surface = self.font_large.render("Options", True, (255, 255, 255))  # Create a surface for the menu.
-        engine_instance.screen.blit(menu_surface, (200, 150))                      # Draw the menu.
+        self._background_image.blit(0,0)
+        #menu_surface = self.font_large.render("Options", True, (255, 255, 255))  # Create a surface for the menu.
+        #engine_instance.screen.blit(menu_surface, (200, 150))                      # Draw the menu.
 
         # Create the Back option.
         back_color = (255, 255, 0) if self.selected_option == 0 else (255, 255, 255)
         back_surface = self.font_small.render("Back", True, back_color)
-        engine_instance.screen.blit(back_surface, (250, 250))
+        engine_instance.screen.blit(back_surface, (600, 600))
 
 class MainMenuState:
     def __init__(self, previous_state):
@@ -328,6 +338,9 @@ class ExampleState:
         # Load instructions asset
         self._instructions_image = Image("./assets/instructions.png")  # Load the instructions image.
         self._settings = Image("./assets/settings.png")                # Load the settings image.
+        self._background_image = Image("./assets/background.png")  # Load the background
+
+        self._ctr = 0
 
 
 
@@ -349,13 +362,15 @@ class ExampleState:
             self._vertical_velocity += self._gravity  # Apply gravity.
         else:                                         # If the cube is on the ground.
             self._vertical_velocity = 0               # Reset vertical velocity.
+            self.is_jumping = False
+
 
         if engine_instance.keyboard.is_key_down(pygame.K_UP) and not self.is_jumping:  # If the up arrow is pressed and the cube is not in the air.
                 self._vertical_velocity = self._jump_strength                          # Set initial jump velocity.
                 self.is_jumping = True                                                 # Set that the cube is in the air.
 
-        self.moving_left = engine_instance.keyboard.is_key_down(pygame.K_LEFT)    # Check if the left arrow is pressed.
-        self.moving_right = engine_instance.keyboard.is_key_down(pygame.K_RIGHT)  # Check if the right arrow is pressed.
+        #self.moving_left = engine_instance.keyboard.is_key_down(pygame.K_LEFT)    # Check if the left arrow is pressed.
+        #self.moving_right = engine_instance.keyboard.is_key_down(pygame.K_RIGHT)  # Check if the right arrow is pressed.
 
         if engine_instance.keyboard.is_key_down(pygame.K_UP):
             if not self.is_jumping:
@@ -370,6 +385,7 @@ class ExampleState:
         elif self.moving_right:       # If its moving right.
             horizontal_movement = 10  # Set the horizontal movement to 10.
 
+        print(self._vertical_velocity)
         collisions, collides_with = self._cube.move(horizontal_movement, self._vertical_velocity, self._level)  # Move the cube.
 
         if collisions['bottom']:         # If the cube is colliding with something under it.
@@ -385,6 +401,8 @@ class ExampleState:
                 engine_instance.state = GameOverState(self._level, self._cube, self._startpoint, 0)  # The user won.
                 
     def draw(self):
+        self._background_image.blit(self._ctr,self._ctr)
+        self._ctr -= 1
         self._instructions_image.blit(10, 10)  # Adjust the x, y position as needed
         self._settings.blit(1500, 10)  # Adjust the x, y position as needed
         self._cube.draw() # draw cube
