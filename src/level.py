@@ -13,6 +13,7 @@ Created:
 Revisions:
     Nov 9, 2024: Moved level functionality out of test.py and updated how levels are specified - Sean Hammell
     Nov 9, 2024: Began implementing level 1 - Sean Hammell
+    Nov 9, 2024: Added extra information about the new layout specifications - Sean Hammell
 Preconditions:
 Postconditions:
 Error Conditions:
@@ -58,6 +59,28 @@ class Spikes(Object):
         """
         super().__init__("./assets/spikes.png", x, y, 120, 120)
 
+"""
+A note on the level specifications:
+    Each level specification is a dictionary storing the positions of the environment
+    objects and hazards in the level.
+
+    'ground' stores the range of (x0, x1) range of ground tiles. In other words, this is
+    how long the level is.
+
+    'spikes' stores the (x0, x1, y) position of each set of spikes. For example,
+    (0, 240, 780) will lay spikes from 0 to 240 on the x-axis at a height of 780.
+
+    Since 'ground' and 'spikes' store ranges, when the Level parses them, it iterates
+    over the ranges in steps equal to the width of the tiles (120 at the time of
+    writing).
+
+    'platforms' stores the (x, y) position of each platform tile.
+
+    'checkpoints' stores the (x, y) position of each checkpoint flag.
+
+    'end' stores the (x, y) position of the end flag
+"""
+
 # Tutorial level layout specification.
 level0 = {
     "ground": (0, 4800),
@@ -77,6 +100,7 @@ level0 = {
     "end": (5200, 780),
 }
 
+# Level 1 layout specification.
 level1 = {
     "ground": (0, 20000),
     "platforms": [
