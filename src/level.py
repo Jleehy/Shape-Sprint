@@ -59,6 +59,7 @@ class Spikes(Object):
         """
         super().__init__("./assets/spikes.png", x, y, 120, 120)
 
+
 """
 A note on the level specifications:
     Each level specification is a dictionary storing the positions of the environment
@@ -112,7 +113,7 @@ level1 = {
     "spikes": [
         (1200, 1320, 780),
         (2400, 2520, 780),
-        (3600, 6000, 780),
+        (3600, 5880, 780),
     ],
     "end": (7200, 780),
 }
