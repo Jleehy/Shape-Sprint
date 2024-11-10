@@ -67,11 +67,11 @@ from object import Object  # Import the Object class to create game entities.
 # A Cube is an Object which represents the playable entity in the game.
 class Cube(Object):
     # Initializes a Cube with the image path, size and position.
-    def __init__(self, startY):
+    def __init__(self, startpoint):
         """
         Initializes a Cube object.
         """
-        super().__init__("./assets/cube.png", 130, startY, 120, 120) #supers init
+        super().__init__("./assets/cube.png", 130, startpoint[1], 120, 120) #supers init
 
     # Moves the Cube and handles collisions.
     def move(self, x, y, level):
@@ -217,7 +217,7 @@ class OptionsMenuState:
         # Create the Back option.
         back_color = (255, 255, 0) if self.selected_option == 0 else (255, 255, 255)
         back_surface = self.font_small.render("Back", True, back_color)
-        engine_instance.screen.blit(back_surface, (600, 600))
+        engine_instance.screen.blit(back_surface, (650, 600))
 
 class LevelSelectMenuState:
     def __init__(self, last_key_time):
@@ -256,7 +256,7 @@ class LevelSelectMenuState:
         # Create the Back option.
         back_color = (255, 255, 0) if self.selected_option == 0 else (255, 255, 255)
         back_surface = self.font_small.render("Back", True, back_color)
-        engine_instance.screen.blit(back_surface, (600, 600))
+        engine_instance.screen.blit(back_surface, (650, 550))
 
 class MainMenuState:
     def __init__(self, previous_state):
@@ -315,11 +315,18 @@ class MainMenuState:
 # ExampleState manages the main gameplay, handling Cube movement, collisions, and rendering.
 class ExampleState:
     # Initializes ExampleState, setting up Cube, Level, and other parameters.
-    def __init__(self, level_id = 0, startpoint=[130, 780]):
+    def __init__(self, level_id = 0, startpoint=[130, 780, 0]):
         # Initialize objects.
         self._startpoint = startpoint # startpoint var to be used w/ checkpoints
-        self._cube = Cube(startpoint[1]) # Store the Cube data.
+        self._cube = Cube(startpoint) # Store the Cube data.
         self._level = Level(levels[level_id], startpoint[0] - 130) # Store the Level data.
+
+        if startpoint[2] != 0:
+            for platform in self._level._environment: #move every object in the environment list
+                platform._acceleration = startpoint[2] #move each platform
+
+            for hazard in self._level._hazards: #move every object in the hazard list
+                hazard._acceleration = startpoint[2] # move each hazard
 
         # Initialize physics.
         self._gravity = 1  # Store the gravity data.
@@ -396,7 +403,7 @@ class ExampleState:
             if isinstance(obj, Spikes):                                                              # If it's spikes.
                 engine_instance.state = GameOverState(self._level, self._cube, self._startpoint, 1)  # The user lost.
             if isinstance(obj, CheckpointFlag):                                                      # If it's a checkpoint.
-                self._startpoint = [obj._base_x, obj._base_y]                                        # Update the startpoint.
+                self._startpoint = [obj._base_x, obj._base_y, obj._acceleration]                                        # Update the startpoint.
             if isinstance(obj, EndFlag):                                                             # If it's an end flag.
                 engine_instance.state = GameOverState(self._level, self._cube, self._startpoint, 0)  # The user won.
 
@@ -445,11 +452,10 @@ class GameOverState:
                 elif self.selected_option == 1:                             # If Quit is selected.
                     engine_instance.state = OpeningMenuState(self.last_key_time)                                              # Exit the game.
                 elif self.selected_option == 2:
-                    if self._level.id + 1 in levels:
-                        if self._endstate == 0:
-                            engine_instance.state = ExampleState(self._level.id + 1)
-                        else:
-                            engine_instance.state = ExampleState(self._level.id, self._startpoint)
+                    if (self._level.id + 1 in levels) and (self._endstate == 0):
+                        engine_instance.state = ExampleState(self._level.id + 1)
+                    elif (self._endstate == 1):
+                        engine_instance.state = ExampleState(self._level.id, self._startpoint)
                     else:
                         engine_instance.state = OpeningMenuState(self.last_key_time)
 
