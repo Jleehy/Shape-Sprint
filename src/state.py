@@ -152,43 +152,39 @@ class GameState:
 # Base class for menu states to centralize common functionality.
 class BaseMenuState(State):
     def __init__(self, options, background_path, last_key_time, font_large_size=72, font_small_size=36):
-        self.font_large = pygame.font.SysFont(None, font_large_size)
-        self.font_small = pygame.font.SysFont(None, font_small_size)
-        self.options = options
-        self.selected_option = 0
-        self.last_key_time = last_key_time
-        self.key_delay = 0.2
-        self._background_image = pygame.image.load(background_path)
+        self.font_large = pygame.font.SysFont(None, font_large_size) # Create a large font.
+        self.font_small = pygame.font.SysFont(None, font_small_size) # Create a snakk font.
+        self.options = options # Set the available options.
+        self.selected_option = 0 # Set the current selected option.
+        self.last_key_time = last_key_time # Record the time of the last key press.
+        self.key_delay = 0.2 # Delay required before accepting key presses.
+        self._background_image = pygame.image.load(background_path) # Set the background image.
 
     def update(self):
         """Updates menu state with input handling."""
-        current_time = time.time()
-        if current_time - self.last_key_time <= self.key_delay:
+        current_time = time.time() # Record the current time.
+        if current_time - self.last_key_time <= self.key_delay: # If enough time has elapsed since the last key press.
             return
 
-        if engine_instance.keyboard.is_key_down(pygame.K_DOWN):
-            self.selected_option = (self.selected_option + 1) % len(self.options)
-            self.last_key_time = current_time
-        elif engine_instance.keyboard.is_key_down(pygame.K_UP):
-            self.selected_option = (self.selected_option - 1) % len(self.options)
-            self.last_key_time = current_time
-        elif engine_instance.keyboard.is_key_down(pygame.K_RETURN):
-            self.last_key_time = current_time
-            self.select_option()
+        if engine_instance.keyboard.is_key_down(pygame.K_DOWN): # If the down key is pressed.
+            self.selected_option = (self.selected_option + 1) % len(self.options) # Cycle through the options.
+            self.last_key_time = current_time # Record the time of the key press.
+        elif engine_instance.keyboard.is_key_down(pygame.K_UP): # If the up key is pressed.
+            self.selected_option = (self.selected_option - 1) % len(self.options) # Cycle through the options.
+            self.last_key_time = current_time # Record the time of the key press.
+        elif engine_instance.keyboard.is_key_down(pygame.K_RETURN): # If the return key is pressed.
+            self.last_key_time = current_time # Record the time of the key press.
+            self.select_option() # Select the option.
 
     def draw(self):
         """Draws the menu options with highlight on selected option."""
-        engine_instance.screen.fill((0, 0, 0))
-        engine_instance.screen.blit(self._background_image, (0, 0))
+        engine_instance.screen.fill((0, 0, 0)) # Fill the background screen.
+        engine_instance.screen.blit(self._background_image, (0, 0)) # Set the background image.
 
-        for index, option in enumerate(self.options):
-            color = (255, 255, 0) if self.selected_option == index else (255, 255, 255)
-            option_surface = self.font_small.render(option, True, color)
-            engine_instance.screen.blit(option_surface, (650, 600 + index * 100))
-
-    def select_option(self):
-        """Placeholder for option selection logic. Should be overridden in subclasses."""
-        pass
+        for index, option in enumerate(self.options): # Iterate through all possible options.
+            color = (255, 255, 0) if self.selected_option == index else (255, 255, 255) # Change button color if hovered.
+            option_surface = self.font_small.render(option, True, color) # Render the option as a button.
+            engine_instance.screen.blit(option_surface, (650, 600 + index * 100)) # Draw the button.
 
 # Opening menu state with custom select_option logic.
 class OpeningMenuState(BaseMenuState):
