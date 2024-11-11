@@ -12,6 +12,7 @@ Created:
     Oct 23, 2024
 Revisions:
     Oct 27, 2024: Finalized prologue comments - Sean Hammell
+    Nov 10, 2024: Fixed circular import dependency on states and engine. - Mario Simental
 Preconditions:
     The Pygame library is available.
     The Keyboard class is defined.
@@ -35,8 +36,6 @@ import sys
 import pygame
 
 from keyboard import Keyboard
-from state import State
-
 
 class Engine:
     def __init__(self):
@@ -51,7 +50,7 @@ class Engine:
         self.screen = pygame.display.set_mode((1600, 1200), flags=pygame.SCALED, vsync=1)
 
         # Start with an empty state.
-        self.state = State()
+        self.state = None
 
         # Track key presses.
         self.keyboard = Keyboard()

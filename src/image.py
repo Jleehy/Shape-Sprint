@@ -30,7 +30,7 @@ Known Faults:
 
 import pygame
 
-from engine import Engine, engine_instance
+from engine import engine_instance
 
 
 class Image:

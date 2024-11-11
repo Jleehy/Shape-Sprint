@@ -14,6 +14,8 @@ Revisions:
     Nov 9, 2024: Moved level functionality out of test.py and updated how levels are specified - Sean Hammell
     Nov 9, 2024: Began implementing level 1 - Sean Hammell
     Nov 9, 2024: Added extra information about the new layout specifications - Sean Hammell
+    Nov 10, 2024: Added extra information about the new layout specifications - Sean Hammell
+    Nov 10, 2024: Added Cube object into level.py - Mario Simental
 Preconditions:
 Postconditions:
 Error Conditions:
@@ -24,40 +26,92 @@ Known Faults:
 
 from object import Object
 
+# A Cube is an Object which represents the playable entity in the game.
+class Cube(Object):
+    # Initializes a Cube with the image path, size and position.
+    def __init__(self, startpoint):
+        """
+        Initializes a Cube object.
+        """
+        super().__init__("src/assets/cube.png", 130, startpoint[1], 120, 120) #supers init
+
+    # Moves the Cube and handles collisions.
+    def move(self, x, y, level):
+        """
+        Moves the Cube and handles collisions.
+        """
+        collision_checks = {'top': False, 'bottom': False, 'left': False, 'right': False} # Track collisions on each side.
+        collides_with = [] # List of objects the Cube collides with.
+            
+        collision_list = level.get_collisions(self) # Get objects colliding with Cube after a horizontal movement.
+
+        # Handle horizontal collisions.
+        for obj in collision_list: #iterate over objects
+            if not (isinstance(obj, CheckpointFlag) or isinstance(obj, EndFlag)): #only handle collisions for objects that shouldnt be moved through
+                if x > 0:  # Moving right
+                    self._rect.right = obj._rect.left  # Push cube back to the left edge of the object
+                    collision_checks['right'] = True # Update right-side collision.
+                elif x < 0:  # Moving left
+                    self._rect.left = obj._rect.right  # Push cube back to the right edge of the object
+                    collision_checks['left'] = True # Update left-side collision.
+            collides_with.append(obj) # Add object to list of objects the Cube collides with.
+            
+        #self._rect.y += y # Update the Cube's vertical position.
+        collision_list = level.get_collisions(self) # Get objects colliding with Cube after a vertical movement.
+        
+        # Handle vertical collisions
+        for obj in collision_list: #iterate over objects
+            if not (isinstance(obj, CheckpointFlag) or isinstance(obj, EndFlag)): #only handle collisions for objects that shouldnt be moved through
+                if y > 0:  # Moving down
+                    self._rect.bottom = obj._rect.top  # Snap to the top of the object
+                    collision_checks['bottom'] = True # Update bottom-side collision.
+                elif self._rect.top > obj._rect.top:  # Moving up
+                    self._rect.top = obj._rect.bottom  # Snap to the bottom of the object
+                    collision_checks['top'] = True # Update top-side collision.
+            collides_with.append(obj) # Add object to list of objects the Cube collides with.
+
+        for platform in level._environment: #move every object in the environment list
+            platform.move_object(x, y) #move each platform
+
+        for hazard in level._hazards: #move every object in the hazard list
+            hazard.move_object(x, y) # move each hazard
+
+        return collision_checks, collides_with # Return collision data.
+
 class Ground(Object):
     def __init__(self, x, y):
         """
         Initializes a ground tile.
         """
-        super().__init__("./assets/ground.png", x, y, 800, 150)
+        super().__init__("src/assets/ground.png", x, y, 800, 150)
 
 class Platform(Object):
     def __init__(self, x, y):
         """
         Initializes a platform tile.
         """
-        super().__init__("./assets/platform.png", x, y, 200, 25)
+        super().__init__("src/assets/platform.png", x, y, 200, 25)
 
 class CheckpointFlag(Object):
     def __init__(self, x, y):
         """
         Initializes a flag to serve as a mid-level checkpoint.
         """
-        super().__init__("./assets/checkpoint.png", x, y, 60, 120)
+        super().__init__("src/assets/checkpoint.png", x, y, 60, 120)
 
 class EndFlag(Object):
     def __init__(self, x, y):
         """
         Initializes a flag to signify the end of a level.
         """
-        super().__init__("./assets/end.png", x, y, 60, 120)
+        super().__init__("src/assets/end.png", x, y, 60, 120)
 
 class Spikes(Object):
     def __init__(self, x, y):
         """
         Initializes a hazardous spikes tile.
         """
-        super().__init__("./assets/spikes.png", x, y, 120, 120)
+        super().__init__("src/assets/spikes.png", x, y, 120, 120)
 
 
 """

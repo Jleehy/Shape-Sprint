@@ -1,5 +1,5 @@
 """
-test.py
+main.py
 Description:
     Serves as a testing ground for the initial implementation of a platform-style game with level progression,
     obstacles, checkpoints, and basic player control mechanics. The game simulates gravity, jumping, 
@@ -25,6 +25,10 @@ Revisions:
     Oct 26, 2024: Added level progression (scrolling screen) - Jacob Leehy
     Oct 27, 2024: Added checkpoints, game end, pause menu, platforms, and instructions - Jacob Leehy
     Oct 27, 2024: Cleaned up comments - Sean Hammell
+    Nov 2, 2024: Created the opening menu, options menu, and level select menu. Made sure game loads into opening menu. - Steve Gan
+    Nov 9, 2024: Split out Level and Object classes to separate files - Sean Hammell
+    Nov 10, 2024: Added volume up and down option to option menu - Steve Gan
+    Nov 10, 2024: Split up functionality from test.py into main.py and into their respective modules. - Mario Simental
 Preconditions:
     - Pygame and required custom modules (audio, engine, image, sound_effect) are installed and accessible.
     - Assets such as images and sound files are located in the specified file paths.
@@ -52,15 +56,15 @@ Known Faults:
     - Restart after completing the level doesn't ignore checkpoints
 """
 import pygame # Import the Pygame library.
-from engine import Engine, engine_instance # Imports the Engine class and a singleton instance.
-from state import ExampleState # Imports the ExampleState class.
+from engine import engine_instance  # Imports the engine singleton instance.
+from state import OpeningMenuState # Imports the OpeningMenuState class.
 
 # Main function.
 def main():
     """
     Sets the initial game state and passes control to the engine.
     """
-    engine_instance.state = ExampleState()  # Set the initial game state.
+    engine_instance.state = OpeningMenuState(0)  # Set the initial game state.
     engine_instance.run_loop()              # Pass control to the engine.
 
 # Main entry point.
