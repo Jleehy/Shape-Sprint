@@ -251,7 +251,7 @@ class MainMenuState(BaseMenuState):
 
 class GameOverState(BaseMenuState):
     def __init__(self, level, cube, startpoint, endstate, last_key_time=None):
-        options = ["Restart", "Quit", "Continue"]
+        options = ["Continue", "Restart", "Quit"]
         if last_key_time is None:
             last_key_time = time.time()  # Use current time if not provided
         super().__init__(options, "src/assets/mainMenuBackground.png", last_key_time)
@@ -264,16 +264,16 @@ class GameOverState(BaseMenuState):
 
     def select_option(self):
         """Defines actions based on the selected option in the Game Over menu."""
-        if self.selected_option == 0:  # Restart
-            engine_instance.state = GameState(self._level.id)  # Restart the current level
-        elif self.selected_option == 1:  # Quit
-            engine_instance.state = OpeningMenuState(self.last_key_time)  # Return to the main menu
-        elif self.selected_option == 2:  # Continue
+        if self.selected_option == 0:  # Continue
             if (self._level.id + 1 in levels) and (self._endstate == 0):  # If next level is available and endstate is 0
                 engine_instance.state = GameState(self._level.id + 1)  # Continue to the next level
             elif self._endstate == 1:  # Retry the level from the startpoint
                 engine_instance.state = GameState(self._level.id, self._startpoint)
             else:  # Otherwise, return to main menu
                 engine_instance.state = OpeningMenuState(self.last_key_time)
+        elif  self.selected_option == 1:  # Restart
+            engine_instance.state = GameState(self._level.id)  # Restart the current level
+        elif self.selected_option == 2:  # Quit
+            engine_instance.state = OpeningMenuState(self.last_key_time)  # Return to the main menu
 
 
