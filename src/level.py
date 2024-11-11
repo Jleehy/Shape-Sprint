@@ -1,28 +1,57 @@
 """
 level.py
 Description:
-    Represents a level of the game.
+    Represents a level of the game, including environmental features such as ground tiles, platforms,
+    checkpoints, and hazards. Provides functionality for loading level specifications, drawing objects,
+    and detecting collisions with the Cube character.
+
 Programmers:
     Steve Gan
     Sean Hammell
     Jacob Leehy
     Mario Simental
     Matthew Sullivan
+
 Created:
     Nov 9, 2024
+
 Revisions:
     Nov 9, 2024: Moved level functionality out of test.py and updated how levels are specified - Sean Hammell
     Nov 9, 2024: Began implementing level 1 - Sean Hammell
     Nov 9, 2024: Added extra information about the new layout specifications - Sean Hammell
+    Nov 9, 2024: Update all sprites - Jacob Leehy
+    Nov 9, 2024: Adjust collision intercations to fix vertical tracking - Jacob Leehy
     Nov 10, 2024: Added extra information about the new layout specifications - Sean Hammell
     Nov 10, 2024: Added Cube object into level.py - Mario Simental
+    Nov 10, 2024: Redesign level 0 and add level 1 - Jacob Leehy
+
 Preconditions:
+    - Assets such as cube.png, ground.png, platform.png, checkpoint.png, end.png, and spikes.png exist
+      in the specified file paths.
+    - Input specifications for levels, including ground ranges, platform positions, spike locations,
+      checkpoint positions, and end flag positions, must be properly formatted as dictionaries.
+
 Postconditions:
+    - A Level object is created with initialized environment and hazard objects that can be used for
+      drawing and collision checking.
+    - Environment objects and hazards are appropriately offset according to the starting position of the level.
+
 Error Conditions:
+    - Missing or improperly formatted level specifications.
+    - Invalid asset paths or missing image files.
+
 Side Effects:
+    - Modifies the state of objects within the level when moving or colliding with the Cube.
+    - Generates drawing calls for all level objects and hazards.
+
 Invariants:
+    - Level environment and hazards are properly offset and aligned based on tile dimensions.
+    - Collision detection returns accurate results for Cube-object interactions.
+
 Known Faults:
+    - The cube can sometimes faze into the ground after landing from jumps. This doesn't affect gameplay, just visuals.
 """
+
 
 from object import Object
 
@@ -33,7 +62,7 @@ class Cube(Object):
         """
         Initializes a Cube object.
         """
-        super().__init__("src/assets/cube.png", 130, startpoint[1], 120, 120) #supers init
+        super().__init__("assets/cube.png", 130, startpoint[1], 120, 120) #supers init
 
     # Moves the Cube and handles collisions.
     def move(self, x, y, level):
@@ -78,40 +107,40 @@ class Cube(Object):
 
         return collision_checks, collides_with # Return collision data.
 
-class Ground(Object):
+class Ground(Object): #class for ground
     def __init__(self, x, y):
         """
         Initializes a ground tile.
         """
-        super().__init__("src/assets/ground.png", x, y, 800, 150)
+        super().__init__("assets/ground.png", x, y, 800, 150) #supers with dimensions
 
-class Platform(Object):
+class Platform(Object): # class for platform
     def __init__(self, x, y):
         """
         Initializes a platform tile.
         """
-        super().__init__("src/assets/platform.png", x, y, 200, 25)
+        super().__init__("assets/platform.png", x, y, 200, 25)#supers with dimensions
 
-class CheckpointFlag(Object):
+class CheckpointFlag(Object): #class for checkpoint
     def __init__(self, x, y):
         """
         Initializes a flag to serve as a mid-level checkpoint.
         """
-        super().__init__("src/assets/checkpoint.png", x, y, 60, 120)
+        super().__init__("assets/checkpoint.png", x, y, 60, 120)#supers with dimensions
 
-class EndFlag(Object):
+class EndFlag(Object): #class for end flag
     def __init__(self, x, y):
         """
         Initializes a flag to signify the end of a level.
         """
-        super().__init__("src/assets/end.png", x, y, 60, 120)
+        super().__init__("assets/end.png", x, y, 60, 120)#supers with dimensions
 
-class Spikes(Object):
+class Spikes(Object): # class for spikes
     def __init__(self, x, y):
         """
         Initializes a hazardous spikes tile.
         """
-        super().__init__("src/assets/spikes.png", x, y, 120, 120)
+        super().__init__("assets/spikes.png", x, y, 120, 120)#supers with dimensions
 
 
 """
@@ -136,97 +165,74 @@ A note on the level specifications:
     'end' stores the (x, y) position of the end flag
 """
 
-# Tutorial level layout specification.
+# Enhanced Tutorial level layout specification for a more interesting Level 0.
 level0 = {
-    "id": 0,
-    "ground": (-240, 10000),
-    "platforms": [
-        (3300, 750),
-        (3500, 750),
+    "id": 0, # level id
+    "ground": (-240, 30000),  # Extended ground length to 25,000 units
+    "platforms": [], # platforms list
+    "checkpoints": [ # checkpoint list
+        (5000, 780), # new checkpoint
+        (20000, 780),  # New checkpoint added
     ],
-    "checkpoints": [
-        (3440, 630),
+    "spikes": [ # list for spikes
+        (700, 820, 780),  #spikes
+        (1600, 1720, 780), #spikes
+        (2500, 2600, 780), #spikes
+        (3700, 3820, 780), #spikes
+        (6000, 6120, 780), #spikes
+        (9200, 9320, 780), #spikes
+        (9800, 9920, 780), #spikes
+        (11000, 11120, 780), #spikes
+        (12500, 12620, 780), #spikes
+        (13200, 13320, 780), #spikes
+        (14500, 15340, 780), #spikes
+        (16800, 16920, 780), #spikes
+        (18500, 18620, 780), #spikes
+        (19500, 19620, 780),  # New spike segment after the 20,000 checkpoint
+        (23000, 24200, 780), #spikes
     ],
-    "spikes": [
-        (600, 720, 780),
-        (1700, 1820, 780),
-        (3440, 3560, 780),
-        (3800, 3920, 780),
-    ],
-    "end": (5200, 780),
+    "end": (29000, 780),  # Moved end to 24,500 to complete the longer level
 }
+
 
 # Level 1 layout specification.
 level1 = {
-    "id": 1,
-    "ground": (-240, 40000),
+    "id": 1, # level id
+    "ground": (-240, 40000), # ground range
     "platforms": [
-        (3600, 750),
-        (4600, 600),
-        (5600, 750),
-        (8500, 750),
-        (8700, 750),
-        (8900, 750),
-        (10400, 550),
-        (11900, 350),
+        (3600, 750), #platforms
+        (4600, 600), #platforms
+        (5600, 750), #platforms
+        (8500, 750), #platforms
+        (8700, 750), #platforms
+        (8900, 750), #platforms
+        (10400, 550), #platforms
+        (11900, 350), #platforms
 
 
         
     ],
-    "checkpoints": [(17400, 780)],
-    "spikes": [
-        (1200, 1320, 780),
-        (2400, 2520, 780),
-        (3600, 5880, 780),
-        (7000, 7120, 780),
-        (8500, 11000, 780),
-        (19000, 19120, 780),
-        (21000, 21120, 780),
-        (25000, 25120, 780),
-        (29000, 29120, 780),
+    "checkpoints": [(17400, 780)], #checkpoint
+    "spikes": [ #spikes
+        (1200, 1320, 780), #spikes
+        (2400, 2520, 780), #spikes
+        (3600, 5880, 780), #spikes
+        (7000, 7120, 780), #spikes
+        (8500, 11000, 780), #spikes
+        (19000, 19120, 780), #spikes
+        (21000, 21120, 780), #spikes
+        (25000, 25120, 780), #spikes
+        (29000, 29120, 780), #spikes
 
 
     ],
-    "end": (35000, 780),
+    "end": (35000, 780), # end flag
 }
 
-'''
-# Level 1 layout specification.
-level2 = {
-    "ground": (0, 50000),
-    "platforms": [
-        (3600, 750),
-        (4600, 600),
-        (5600, 750),
-        (8500, 750),
-        (8700, 750),
-        (8900, 750),
-        (10400, 550),
-        (11900, 350),
 
-
-        
-    ],
-    "checkpoints": [(18000, 780)],
-    "spikes": [
-        (1200, 1320, 780),
-        (2400, 2520, 780),
-        (3600, 5880, 780),
-        (7000, 7120, 780),
-        (8500, 11000, 780),
-        (19000, 19120, 780),
-        (21000, 21120, 780),
-        (25000, 25120, 780),
-        (29000, 29120, 780),
-
-
-    ],
-    "end": (35000, 780),
-}
-'''
-levels = {
-    0: level0,
-    1: level1,
+levels = { # levels
+    0: level0, #level 0
+    1: level1, # level 1
 }
 
 class Level:
@@ -275,8 +281,8 @@ class Level:
         """
         Draws all environment and hazard objects.
         """
-        for obj in self._environment + self._hazards:
-            obj.draw()
+        for obj in self._environment + self._hazards: #iterate over environment anf hazards
+            obj.draw() # draw everything
 
     def get_collisions(self, cube):
         """
