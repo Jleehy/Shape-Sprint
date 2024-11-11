@@ -27,6 +27,9 @@ Revisions:
     Oct 27, 2024: Cleaned up comments - Sean Hammell
     Nov 2, 2024: Created the opening menu, options menu, and level select menu. Made sure game loads into opening menu. - Steve Gan
     Nov 9, 2024: Split out Level and Object classes to separate files - Sean Hammell
+    Nov 9, 2024: Create and implement background for all of the major menus - Jacob Leehy
+    Nov 9, 2024: Remove left and right arrow key movement - Jacob Leehy
+    Nov 10, 2024: Patch checkpoint bugs and implement speed retention between checkpoints - Jacob Leehy
     Nov 10, 2024: Added volume up and down option to option menu - Steve Gan
     Nov 10, 2024: Split up functionality from test.py into main.py and into their respective modules. - Mario Simental
 Preconditions:
