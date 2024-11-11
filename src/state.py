@@ -1,7 +1,8 @@
 """
 state.py
 Description:
-    Defines an abstract base class for game states.
+    Defines an abstract base class for game states, including concrete game and menu states
+    for handling various phases of gameplay, menu interactions, and game navigation.
 Programmers:
     Steve Gan
     Sean Hammell
@@ -13,19 +14,25 @@ Created:
 Revisions:
     Oct 27, 2024: Finalized prologue comments - Sean Hammell
     Nov 10, 2024: Modularized states and further abstracted menu related states. - Mario Simental
+    Nov 10, 2024: Add comments - Jacob Leehy
 Preconditions:
-    None.
+    Requires Pygame and imported dependencies (engine, Image, SoundEffect, etc.) to function.
 Postconditions:
-    None.
+    Provides a structured interface for state-based game logic, enabling modular management 
+    of different game screens and main gameplay loop.
 Error Conditions:
-    None.
+    None currently handled; assumes all required files (images, sounds) are present and 
+    correctly formatted.
 Side Effects:
-    None.
+    Changes engine state during menu navigation and gameplay.
 Invariants:
-    None.
+    Assumes a consistent control interface provided by the engine_instance for handling 
+    input, sound, and graphics.
 Known Faults:
-    None.
+    State transitions are managed via direct assignments; unintended transitions may occur 
+    if engine_instance state isn't carefully managed.
 """
+
 
 import pygame  # Import the Pygame library.
 import sys     # Import system-specific parameters and functions.
@@ -42,11 +49,11 @@ from object import Object  # Import the Object class to create game entities.
 # State is an abstract base class. This definition is meant to give the Engine class
 # visibility of the update and draw methods.
 class State:
-    def update(self):
-        pass
+    def update(self): #update
+        pass # pass
 
-    def draw(self):
-        pass
+    def draw(self): # update
+        pass # pass
 
 # GameState manages the main gameplay, handling Cube movement, collisions, and rendering.
 class GameState:
@@ -70,8 +77,8 @@ class GameState:
         self._vertical_velocity = 0 # Store the vertical velocity data.
 
          # Initialize audio.
-        self._sound = SoundEffect("src/assets/sound.wav") # sound effects just in case we use them
-        set_music("src/assets/music.wav")  # Set the game music.
+        self._sound = SoundEffect("assets/sound.wav") # sound effects just in case we use them
+        set_music("assets/music.wav")  # Set the game music.
         play_music()                     # Play the game music.
 
         # Initialize movement flags.
@@ -80,11 +87,11 @@ class GameState:
         self.is_jumping = False # Flag if Cube is currently jumping.
 
         # Load instructions asset
-        self._instructions_image = Image("src/assets/instructions.png")  # Load the instructions image.
-        self._settings = Image("src/assets/settings.png")                # Load the settings image.
-        self._background_image = Image("src/assets/background.png")  # Load the background
+        self._instructions_image = Image("assets/instructions.png")  # Load the instructions image.
+        self._settings = Image("assets/settings.png")                # Load the settings image.
+        self._background_image = Image("assets/background.png")  # Load the background
 
-        self._ctr = 0
+        self._ctr = 0 # counter
 
     # Updates Cube position and handles input for movement and sound control.
     def update(self):
@@ -104,7 +111,7 @@ class GameState:
             self._vertical_velocity += self._gravity  # Apply gravity.
         else:                                         # If the cube is on the ground.
             self._vertical_velocity = 0               # Reset vertical velocity.
-            self.is_jumping = False
+            self.is_jumping = False                   #set jumping false
 
 
         if engine_instance.keyboard.is_key_down(pygame.K_UP) and not self.is_jumping:  # If the up arrow is pressed and the cube is not in the air.
@@ -117,7 +124,7 @@ class GameState:
         if engine_instance.keyboard.is_key_down(pygame.K_UP):
             if not self.is_jumping:
                 self._vertical_velocity = self._jump_strength  # Set initial jump velocity
-                self.is_jumping = True
+                self.is_jumping = True                         #set jumping true
 
         # Determine the horizontal movement based on flags
 
@@ -142,8 +149,8 @@ class GameState:
                 engine_instance.state = GameOverState(self._level, self._cube, self._startpoint, 0)  # The user won.
 
     def draw(self):
-        self._background_image.blit(self._ctr,self._ctr)
-        self._ctr -= 1
+        self._background_image.blit(self._ctr,self._ctr) # show background
+        self._ctr -= 1 #counter
         self._instructions_image.blit(10, 10)  # Adjust the x, y position as needed
         self._settings.blit(1500, 10)  # Adjust the x, y position as needed
         self._cube.draw() # draw cube
@@ -151,7 +158,7 @@ class GameState:
 
 # Base class for menu states to centralize common functionality.
 class BaseMenuState(State):
-    def __init__(self, options, background_path, last_key_time, font_large_size=72, font_small_size=36):
+    def __init__(self, options, background_path, last_key_time, font_large_size=72, font_small_size=110): # init
         self.font_large = pygame.font.SysFont(None, font_large_size) # Create a large font.
         self.font_small = pygame.font.SysFont(None, font_small_size) # Create a snakk font.
         self.options = options # Set the available options.
@@ -164,7 +171,7 @@ class BaseMenuState(State):
         """Updates menu state with input handling."""
         current_time = time.time() # Record the current time.
         if current_time - self.last_key_time <= self.key_delay: # If enough time has elapsed since the last key press.
-            return
+            return #return
 
         if engine_instance.keyboard.is_key_down(pygame.K_DOWN): # If the down key is pressed.
             self.selected_option = (self.selected_option + 1) % len(self.options) # Cycle through the options.
@@ -188,75 +195,75 @@ class BaseMenuState(State):
 
 # Opening menu state with custom select_option logic.
 class OpeningMenuState(BaseMenuState):
-    def __init__(self, last_key_time):
-        options = ["Start Game", "Options", "Level Select", "Quit"]
-        super().__init__(options, "src/assets/mainMenuBackground.png", last_key_time, font_large_size=72, font_small_size=110)
+    def __init__(self, last_key_time): #init
+        options = ["Start Game", "Options", "Level Select", "Quit"] # options list
+        super().__init__(options, "assets/mainMenuBackground.png", last_key_time, font_large_size=72, font_small_size=110) #super with info
 
-    def select_option(self):
-        if self.selected_option == 0:
-            engine_instance.state = GameState()
-        elif self.selected_option == 1:
-            engine_instance.state = OptionsMenuState(self.last_key_time)
-        elif self.selected_option == 2:
-            engine_instance.state = LevelSelectMenuState(self.last_key_time)
-        elif self.selected_option == 3:
-            sys.exit()
+    def select_option(self): #option selector
+        if self.selected_option == 0: # if 0
+            engine_instance.state = GameState() #start game
+        elif self.selected_option == 1: # if 1
+            engine_instance.state = OptionsMenuState(self.last_key_time) #open options menu
+        elif self.selected_option == 2: # if 2
+            engine_instance.state = LevelSelectMenuState(self.last_key_time) # open level select menu
+        elif self.selected_option == 3: # if 3
+            sys.exit() # exit
 
 # Options menu state with custom select_option logic.
 class OptionsMenuState(BaseMenuState):
-    def __init__(self, last_key_time):
-        options = ["Back", "Volume Up", "Volume Down"]
-        super().__init__(options, "src/assets/optionsMenuBackground.png", last_key_time)
+    def __init__(self, last_key_time): # init
+        options = ["Back", "Volume Up", "Volume Down"] # opptions list
+        super().__init__(options, "assets/optionsMenuBackground.png", last_key_time) # load asset
 
-    def select_option(self):
-        if self.selected_option == 0:
-            engine_instance.state = OpeningMenuState(self.last_key_time)
-        elif self.selected_option == 1:
-            volume_up()
-        elif self.selected_option == 2:
-            volume_down()
+    def select_option(self): # option selector
+        if self.selected_option == 0: # if 0
+            engine_instance.state = OpeningMenuState(self.last_key_time) # return to opening menu
+        elif self.selected_option == 1: # if 1
+            volume_up() # increace vol
+        elif self.selected_option == 2: # if 2
+            volume_down() # decreace vol
 
 # Level select menu state with custom select_option logic.
 class LevelSelectMenuState(BaseMenuState):
-    def __init__(self, last_key_time):
-        options = ["Back", "Level 1", "Level 2"]
-        super().__init__(options, "src/assets/levelMenuBackground.png", last_key_time)
+    def __init__(self, last_key_time): # init
+        options = ["Back", "Level 1", "Level 2"] # options list
+        super().__init__(options, "assets/levelMenuBackground.png", last_key_time) # super w/ info
 
-    def select_option(self):
-        if self.selected_option == 0:
-            engine_instance.state = OpeningMenuState(self.last_key_time)
-        elif self.selected_option == 1:
-            engine_instance.state = GameState()  # Start at Level 1
-        elif self.selected_option == 2:
-            engine_instance.state = GameState(1)  # Start at Level 2
+    def select_option(self): # selection list
+        if self.selected_option == 0: # if 0
+            engine_instance.state = OpeningMenuState(self.last_key_time) # return to opening menu
+        elif self.selected_option == 1: # if 1
+            engine_instance.state = GameState()  # Start at Level 1 (0)
+        elif self.selected_option == 2: # if 2
+            engine_instance.state = GameState(1)  # Start at Level 2 (1)
 
 # Main menu state for in-game pause menu.
 class MainMenuState(BaseMenuState):
-    def __init__(self, previous_state):
-        options = ["Continue", "Restart", "Quit"]
-        super().__init__(options, "src/assets/mainMenuBackground.png", 0, font_large_size=72, font_small_size=36)
-        self.previous_state = previous_state
+    def __init__(self, previous_state): #init
+        options = ["Continue", "Restart", "Quit"] # options list
+        super().__init__(options, "assets/mainMenuBackground.png", 0, font_large_size=72, font_small_size=110) # super and send info
+        self.previous_state = previous_state # set prev state
 
-    def select_option(self):
-        if self.selected_option == 0:
+    def select_option(self): #options list
+        if self.selected_option == 0: # if 0
             engine_instance.state = self.previous_state  # Resume the game
-        elif self.selected_option == 1:
+        elif self.selected_option == 1: # if 1
             engine_instance.state = GameState()  # Restart the game
-        elif self.selected_option == 2:
+        elif self.selected_option == 2: # if 2
             sys.exit()  # Quit the game
 
-class GameOverState(BaseMenuState):
-    def __init__(self, level, cube, startpoint, endstate, last_key_time=None):
-        options = ["Continue", "Restart", "Quit"]
-        if last_key_time is None:
+class GameOverState(BaseMenuState): # game over menu
+    def __init__(self, level, cube, startpoint, endstate, last_key_time=None): # init
+        options = ["Continue", "Restart", "Main Menu"] # options list
+        if last_key_time is None: # if no key
             last_key_time = time.time()  # Use current time if not provided
-        super().__init__(options, "src/assets/mainMenuBackground.png", last_key_time)
+        super().__init__(options, "assets/mainMenuBackground.png", last_key_time) # super with info
         
         # Store game-specific references
-        self._level = level
-        self._cube = cube
-        self._startpoint = startpoint
-        self._endstate = endstate
+        self._level = level # store level
+        self._cube = cube # store cube
+        self._startpoint = startpoint # store start
+        self._endstate = endstate # store end state
 
     def select_option(self):
         """Defines actions based on the selected option in the Game Over menu."""
