@@ -16,6 +16,7 @@ Created:
     Nov 9, 2024
 
 Revisions:
+    Oct 24, 2024: Added basic collision detection, level class, modularized level related objects, added game over state - Matthew Sullivan
     Nov 9, 2024: Moved level functionality out of test.py and updated how levels are specified - Sean Hammell
     Nov 9, 2024: Began implementing level 1 - Sean Hammell
     Nov 9, 2024: Added extra information about the new layout specifications - Sean Hammell

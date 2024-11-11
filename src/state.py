@@ -12,6 +12,7 @@ Programmers:
 Created:
     Oct 23, 2024
 Revisions:
+    Oct 24, 2024: Added game over state and connected to level - Matthew Sullivans
     Oct 27, 2024: Finalized prologue comments - Sean Hammell
     Nov 10, 2024: Modularized states and further abstracted menu related states. - Mario Simental
     Nov 10, 2024: Add comments - Jacob Leehy
