@@ -11,6 +11,7 @@ Programmers:
 Created:
     Oct 23, 2024
 Revisions:
+    Oct 24, 2024: Modularized engine class - Matthew Sullivan
     Oct 27, 2024: Finalized prologue comments - Sean Hammell
     Nov 10, 2024: Fixed circular import dependency on states and engine. - Mario Simental
 Preconditions:
