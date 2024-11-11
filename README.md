@@ -19,6 +19,6 @@ Ensure you have [Git](https://git-scm.com/) and [Python](https://www.python.org/
   pip install -r requirements.txt
    ```
 
- ## Running the Program (Currently test is the start point)
+ ## Running the Program (Currently main is the entry point)
   ```bash
-  python3 test.py
+  python3 main.py
