@@ -12,13 +12,27 @@ Created:
     Nov 9, 2024
 Revisions:
     Nov 9, 2024: Moved the Object class out of test.py - Sean Hammell
+    Nov 9, 2024: Adjust how movement is handled such that the player is tracked vertically - Jacob Leehy
+    Nov 10, 2024: Add more comments - Jacob Leehy
 Preconditions:
+    - Requires the Pygame library for rendering and collision detection.
+    - `image.py` module must define an `Image` class for handling image loading and rendering.
+    - Valid image path, x and y coordinates, width, and height values must be provided for initialization.
 Postconditions:
+    - Creates and manipulates objects within the game, allowing for position updates, rendering, and collision hitbox visualization.
 Error Conditions:
+    - Invalid file path for image will result in failed image loading.
+    - Non-integer values for position or size parameters may result in unexpected behavior.
 Side Effects:
+    - Alters Pygame display surface by rendering images and hitboxes.
+    - Updates internal acceleration and position counters as the game runs.
 Invariants:
+    - `_x` and `_y` always match `_rect.x` and `_rect.y` for consistent position tracking.
+    - `_counter` increments each frame and resets every 30 frames, controlling the acceleration rate.
 Known Faults:
+    - No known faults at this time.
 """
+
 
 import pygame
 
