@@ -16,6 +16,7 @@ Revisions:
     Oct 27, 2024: Finalized prologue comments - Sean Hammell
     Nov 10, 2024: Modularized states and further abstracted menu related states. - Mario Simental
     Nov 10, 2024: Add comments - Jacob Leehy
+    Nov 11, 2024: Added click sound asset to selections - Matthew Sullivan
 Preconditions:
     Requires Pygame and imported dependencies (engine, Image, SoundEffect, etc.) to function.
 Postconditions:
@@ -76,6 +77,7 @@ class GameState:
         self._gravity = 1  # Store the gravity data.
         self._jump_strength = -24 # Store the jump strength data.
         self._vertical_velocity = 0 # Store the vertical velocity data.
+        self._is_gravity_inverted = False # Store whether gravity should be inverted or not
 
          # Initialize audio.
         self._sound = SoundEffect("assets/sound.wav") # sound effects just in case we use them
@@ -105,6 +107,17 @@ class GameState:
         collisions = self._level.get_collisions(self._cube)                               # Get all collisions.
         non_flag_collision = False                                                        # Check for non-flag collisions.
         for obj in collisions:                                                            # For each colliding object.
+
+            # InvertGravity object check 
+            # Still needs to be tested 
+            '''
+            if isinstance(obj, InvertGravity):
+                self._is_gravity_inverted = not self._is_gravity_inverted # invert gravity flag
+                self._gravity *= -1 # invert gravity direction
+                self._jump_strength *= -1 # invert jump strength
+            '''
+
+
             if (not isinstance(obj, CheckpointFlag)) and (not isinstance(obj, EndFlag)):  # If the object is not a flag.
                 non_flag_collision = True                                                 # The cube hit a non-flag object.
 
@@ -167,6 +180,7 @@ class BaseMenuState(State):
         self.last_key_time = last_key_time # Record the time of the last key press.
         self.key_delay = 0.2 # Delay required before accepting key presses.
         self._background_image = pygame.image.load(background_path) # Set the background image.
+        self.select_sound = SoundEffect("assets/click1.ogg") #click sound
 
     def update(self):
         """Updates menu state with input handling."""
@@ -182,6 +196,7 @@ class BaseMenuState(State):
             self.last_key_time = current_time # Record the time of the key press.
         elif engine_instance.keyboard.is_key_down(pygame.K_RETURN): # If the return key is pressed.
             self.last_key_time = current_time # Record the time of the key press.
+            self.select_sound.play() # Play click1 sound on selection
             self.select_option() # Select the option.
 
     def draw(self):
@@ -202,10 +217,13 @@ class OpeningMenuState(BaseMenuState):
 
     def select_option(self): #option selector
         if self.selected_option == 0: # if 0
+            self.select_sound.play() # Play click1 sound on selection
             engine_instance.state = GameState() #start game
         elif self.selected_option == 1: # if 1
+            self.select_sound.play() # Play click1 sound on selection
             engine_instance.state = OptionsMenuState(self.last_key_time) #open options menu
         elif self.selected_option == 2: # if 2
+            self.select_sound.play() # Play click1 sound on selection
             engine_instance.state = LevelSelectMenuState(self.last_key_time) # open level select menu
         elif self.selected_option == 3: # if 3
             sys.exit() # exit
@@ -218,10 +236,13 @@ class OptionsMenuState(BaseMenuState):
 
     def select_option(self): # option selector
         if self.selected_option == 0: # if 0
+            self.select_sound.play() # Play click1 sound on selection
             engine_instance.state = OpeningMenuState(self.last_key_time) # return to opening menu
         elif self.selected_option == 1: # if 1
+            self.select_sound.play() # Play click1 sound on selection
             volume_up() # increace vol
         elif self.selected_option == 2: # if 2
+            self.select_sound.play() # Play click1 sound on selection
             volume_down() # decreace vol
 
 # Level select menu state with custom select_option logic.
@@ -232,10 +253,13 @@ class LevelSelectMenuState(BaseMenuState):
 
     def select_option(self): # selection list
         if self.selected_option == 0: # if 0
+            self.select_sound.play() # Play click1 sound on selection
             engine_instance.state = OpeningMenuState(self.last_key_time) # return to opening menu
         elif self.selected_option == 1: # if 1
+            self.select_sound.play() # Play click1 sound on selection
             engine_instance.state = GameState()  # Start at Level 1 (0)
         elif self.selected_option == 2: # if 2
+            self.select_sound.play() # Play click1 sound on selection
             engine_instance.state = GameState(1)  # Start at Level 2 (1)
 
 # Main menu state for in-game pause menu.
@@ -247,10 +271,13 @@ class MainMenuState(BaseMenuState):
 
     def select_option(self): #options list
         if self.selected_option == 0: # if 0
+            self.select_sound.play() # Play click1 sound on selection
             engine_instance.state = self.previous_state  # Resume the game
         elif self.selected_option == 1: # if 1
+            self.select_sound.play() # Play click1 sound on selection
             engine_instance.state = GameState()  # Restart the game
         elif self.selected_option == 2: # if 2
+            self.select_sound.play() # Play click1 sound on selection
             sys.exit()  # Quit the game
 
 class GameOverState(BaseMenuState): # game over menu
@@ -270,14 +297,19 @@ class GameOverState(BaseMenuState): # game over menu
         """Defines actions based on the selected option in the Game Over menu."""
         if self.selected_option == 0:  # Continue
             if (self._level.id + 1 in levels) and (self._endstate == 0):  # If next level is available and endstate is 0
+                self.select_sound.play() # Play click1 sound on selection
                 engine_instance.state = GameState(self._level.id + 1)  # Continue to the next level
             elif self._endstate == 1:  # Retry the level from the startpoint
+                self.select_sound.play() # Play click1 sound on selection
                 engine_instance.state = GameState(self._level.id, self._startpoint)
             else:  # Otherwise, return to main menu
+                self.select_sound.play() # Play click1 sound on selection
                 engine_instance.state = OpeningMenuState(self.last_key_time)
         elif  self.selected_option == 1:  # Restart
+            self.select_sound.play() # Play click1 sound on selection
             engine_instance.state = GameState(self._level.id)  # Restart the current level
         elif self.selected_option == 2:  # Quit
+            self.select_sound.play() # Play click1 sound on selection
             engine_instance.state = OpeningMenuState(self.last_key_time)  # Return to the main menu
 
 

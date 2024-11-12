@@ -25,6 +25,7 @@ Revisions:
     Nov 10, 2024: Added extra information about the new layout specifications - Sean Hammell
     Nov 10, 2024: Added Cube object into level.py - Mario Simental
     Nov 10, 2024: Redesign level 0 and add level 1 - Jacob Leehy
+    Nov 11, 2024: Added gravity inverter object - Matthew Sullivan
 
 Preconditions:
     - Assets such as cube.png, ground.png, platform.png, checkpoint.png, end.png, and spikes.png exist
@@ -144,6 +145,14 @@ class Spikes(Object): # class for spikes
         super().__init__("assets/spikes.png", x, y, 120, 120)#supers with dimensions
 
 
+class InvertGravity(Object):
+    def __init__(self, x, y):
+        """
+        Initializes a gravity inverter object 
+        """
+        super().__init__("assets/g1.png", x, y, 100, 100) #supers with dimensions
+
+
 """
 A note on the level specifications:
     Each level specification is a dictionary storing the positions of the environment
@@ -175,6 +184,12 @@ level0 = {
         (5000, 780), # new checkpoint
         (20000, 780),  # New checkpoint added
     ],
+    
+    # Still needs to be tested
+    '''
+    "gravity": [(700, 820, 780)],
+    '''
+    
     "spikes": [ # list for spikes
         (700, 820, 780),  #spikes
         (1600, 1720, 780), #spikes
