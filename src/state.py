@@ -80,13 +80,11 @@ class GameState:
         self._is_gravity_inverted = False # Store whether gravity should be inverted or not
 
          # Initialize audio.
-        self._sound = SoundEffect("assets/sound.wav") # sound effects just in case we use them
+        self._landing_sound = SoundEffect("assets/landing_sound.wav") # landing sound
         set_music("assets/music.wav")  # Set the game music.
         play_music()                     # Play the game music.
 
         # Initialize movement flags.
-        self.moving_left = False # Flag if Cube is currently moving left.
-        self.moving_right = False # Flag if Cube is currently moving right.
         self.is_jumping = False # Flag if Cube is currently jumping.
 
         # Load instructions asset
@@ -103,64 +101,35 @@ class GameState:
         """
         if engine_instance.keyboard.is_key_down(pygame.K_ESCAPE):  # If escape is pressed.
             engine_instance.state = MainMenuState(self)            # Go to the main menu
+        
+        self.is_on_ground = False # Flag if Cube is grounded.
 
         collisions = self._level.get_collisions(self._cube)                               # Get all collisions.
-        non_flag_collision = False                                                        # Check for non-flag collisions.
-        for obj in collisions:                                                            # For each colliding object.
+        for obj in collisions:
+            if isinstance(obj, CheckpointFlag):
+                self._startpoint = [obj._base_x, obj._base_y, obj._acceleration]  # Update the startpoint.
+            elif isinstance(obj, EndFlag):
+                engine_instance.state = GameOverState(self._level, self._cube, self._startpoint, 0)  # The user won.
+            elif isinstance(obj, Spikes):
+                engine_instance.state = GameOverState(self._level, self._cube, self._startpoint, 1)  # The user lost.
+            else:
+                self.is_on_ground = True  # Assume any non-flag collision indicates the cube is on the ground.
 
-            # InvertGravity object check 
-            # Still needs to be tested 
-            '''
-            if isinstance(obj, InvertGravity):
-                self._is_gravity_inverted = not self._is_gravity_inverted # invert gravity flag
-                self._gravity *= -1 # invert gravity direction
-                self._jump_strength *= -1 # invert jump strength
-            '''
-
-
-            if (not isinstance(obj, CheckpointFlag)) and (not isinstance(obj, EndFlag)):  # If the object is not a flag.
-                non_flag_collision = True                                                 # The cube hit a non-flag object.
-
-        if not non_flag_collision:                    # If the cube is in the air.
-            self._vertical_velocity += self._gravity  # Apply gravity.
-        else:                                         # If the cube is on the ground.
+        if self.is_on_ground:                    # If the cube is in the ground.
             self._vertical_velocity = 0               # Reset vertical velocity.
             self.is_jumping = False                   #set jumping false
+        else:                                         # If the cube is in the air.
+            self._vertical_velocity += self._gravity  # Apply gravity.
 
+        if engine_instance.keyboard.is_key_down(pygame.K_UP) and self.is_on_ground and not self.is_jumping:  # If the up arrow is pressed and the cube is not in the air.
+            self._vertical_velocity = self._jump_strength                          # Set initial jump velocity.
+            self.is_jumping = True                                                 # Set that the cube is in the air.
 
-        if engine_instance.keyboard.is_key_down(pygame.K_UP) and not self.is_jumping:  # If the up arrow is pressed and the cube is not in the air.
-                self._vertical_velocity = self._jump_strength                          # Set initial jump velocity.
-                self.is_jumping = True                                                 # Set that the cube is in the air.
-
-        #self.moving_left = engine_instance.keyboard.is_key_down(pygame.K_LEFT)    # Check if the left arrow is pressed.
-        #self.moving_right = engine_instance.keyboard.is_key_down(pygame.K_RIGHT)  # Check if the right arrow is pressed.
-
-        if engine_instance.keyboard.is_key_down(pygame.K_UP):
-            if not self.is_jumping:
-                self._vertical_velocity = self._jump_strength  # Set initial jump velocity
-                self.is_jumping = True                         #set jumping true
-
-        # Determine the horizontal movement based on flags
-
-        horizontal_movement = 0       # Update the horizontal movement.
-        if self.moving_left:          # If its moving left.
-            horizontal_movement = -3  # Set the horizontal movement to -3.
-        elif self.moving_right:       # If its moving right.
-            horizontal_movement = 10  # Set the horizontal movement to 10.
-
-        collisions, collides_with = self._cube.move(horizontal_movement, self._vertical_velocity, self._level)  # Move the cube.
+        collisions, collides_with = self._cube.move(self._cube._acceleration, self._vertical_velocity, self._level)  # Move the cube.
 
         if collisions['bottom']:         # If the cube is colliding with something under it.
             self.is_jumping = False      # Set that the cube is on the ground.
             self._vertical_velocity = 0  # Reset the vertical velocity.
-
-        for obj in collides_with:                                                                    # For each object the cube is colliding with.
-            if isinstance(obj, Spikes):                                                              # If it's spikes.
-                engine_instance.state = GameOverState(self._level, self._cube, self._startpoint, 1)  # The user lost.
-            if isinstance(obj, CheckpointFlag):                                                      # If it's a checkpoint.
-                self._startpoint = [obj._base_x, obj._base_y, obj._acceleration]                                        # Update the startpoint.
-            if isinstance(obj, EndFlag):                                                             # If it's an end flag.
-                engine_instance.state = GameOverState(self._level, self._cube, self._startpoint, 0)  # The user won.
 
     def draw(self):
         self._background_image.blit(self._ctr,self._ctr) # show background
