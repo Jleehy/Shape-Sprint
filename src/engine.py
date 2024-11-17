@@ -86,8 +86,8 @@ class Engine:
             self.state.draw()
             pygame.display.flip()
 
-            # Cap the FPS at 75.
-            clock.tick(75)
+            # Cap the FPS at 60.
+            clock.tick(60)
 
 
 # Global Engine instance.

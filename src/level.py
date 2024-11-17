@@ -185,11 +185,6 @@ level0 = {
         (20000, 780),  # New checkpoint added
     ],
     
-    # Still needs to be tested
-    '''
-    "gravity": [(700, 820, 780)],
-    '''
-    
     "spikes": [ # list for spikes
         (700, 820, 780),  #spikes
         (1600, 1720, 780), #spikes
