@@ -127,6 +127,7 @@ class GameState:
 
         collisions, collides_with = self._cube.move(self._cube._acceleration, self._vertical_velocity, self._level)  # Move the cube.
 
+        """NOTE: If gravity is inverted we will need to check if top surface is collided with."""
         if collisions['bottom']:         # If the cube is colliding with something under it.
             self.is_jumping = False      # Set that the cube is on the ground.
             self._vertical_velocity = 0  # Reset the vertical velocity.
