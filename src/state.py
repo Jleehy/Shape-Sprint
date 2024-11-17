@@ -86,6 +86,8 @@ class GameState:
 
         # Initialize movement flags.
         self.is_jumping = False # Flag if Cube is currently jumping.
+        self.is_on_ground = False # Flag if Cube is grounded.
+
 
         # Load instructions asset
         self._instructions_image = Image("assets/instructions.png")  # Load the instructions image.
@@ -102,6 +104,7 @@ class GameState:
         if engine_instance.keyboard.is_key_down(pygame.K_ESCAPE):  # If escape is pressed.
             engine_instance.state = MainMenuState(self)            # Go to the main menu
         
+        was_in_air = not self.is_on_ground # Track whether Cube was in the air in the last frame, for landing detection.
         self.is_on_ground = False # Flag if Cube is grounded.
 
         collisions = self._level.get_collisions(self._cube)                               # Get all collisions.
@@ -118,6 +121,8 @@ class GameState:
         if self.is_on_ground:                    # If the cube is in the ground.
             self._vertical_velocity = 0               # Reset vertical velocity.
             self.is_jumping = False                   #set jumping false
+            if was_in_air:
+                self._landing_sound.play()
         else:                                         # If the cube is in the air.
             self._vertical_velocity += self._gravity  # Apply gravity.
 
@@ -129,6 +134,7 @@ class GameState:
 
         """NOTE: If gravity is inverted we will need to check if top surface is collided with."""
         if collisions['bottom']:         # If the cube is colliding with something under it.
+            self.is_on_ground = True
             self.is_jumping = False      # Set that the cube is on the ground.
             self._vertical_velocity = 0  # Reset the vertical velocity.
 
