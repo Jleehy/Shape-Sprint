@@ -86,7 +86,7 @@ class Object:
         Moves the object the specified number of pixels.
         """
         self._counter += 1           # Increment counter.
-        if self._counter == 60:      # If 60 frames have passed.
+        if self._counter == 20:      # If 60 frames have passed.
             self._counter = 0        # Reset frame count.
             self._acceleration += 1  # Increment acceleration.
 
