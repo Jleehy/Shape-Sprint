@@ -144,6 +144,13 @@ class Spikes(Object): # class for spikes
         """
         super().__init__("assets/spikes.png", x, y, 120, 120)#supers with dimensions
 
+class IceSpikes(Object): # class for spikes
+    def __init__(self, x, y):
+        """
+        Initializes a hazardous spikes tile.
+        """
+        super().__init__("assets/iceSpikes.png", x, y, 120, 120)#supers with dimensions
+
 
 class InvertGravity(Object):
     def __init__(self, x, y):
@@ -202,6 +209,8 @@ level0 = {
         (19500, 19620, 780),  # New spike segment after the 20,000 checkpoint
         (23000, 24200, 780), #spikes
     ],
+    "iceSpikes": [ #spikes
+    ],
     "end": (29000, 780),  # Moved end to 24,500 to complete the longer level
 }
 
@@ -237,13 +246,67 @@ level1 = {
 
 
     ],
+    "iceSpikes": [ #spikes
+    ],
     "end": (35000, 780), # end flag
 }
 
 
+# Level 1 layout specification.
+level2 = {
+    "id": 2, # level id
+    "ground": (-240, 40000), # ground range
+    "platforms": [
+        (3600, 750), #platforms
+        (4400, 600), #platforms
+        (5500, 750), #platforms
+        (8300, 750), #platforms
+        (8700, 750), #platforms
+        (8900, 750), #platforms
+        (10400, 550), #platforms
+        (11900, 350), #platforms
+
+
+        
+    ],
+    "checkpoints": [(17400, 780)], #checkpoint
+    "spikes": [ #spikes
+         ],
+    "iceSpikes": [ #spikes
+        (1200, 1320, 780), #spikes
+        (2400, 2520, 780), #spikes
+        (3600, 5660, 780), #spikes
+        (7000, 7120, 780), #spikes
+        (8500, 11000, 780), #spikes
+        (19000, 19120, 780), #spikes
+        (21000, 21120, 780), #spikes
+        (25000, 25120, 780), #spikes
+        (29000, 29120, 780), #spikes
+    ],
+    "end": (35000, 780), # end flag
+}
+# Level 1 layout specification.
+level3 = {
+    "id": 3, # level id
+    "ground": (-240, 40000), # ground range
+    "platforms": [
+
+
+        
+    ],
+    "checkpoints": [(17400, 780)], #checkpoint
+    "spikes": [ #spikes
+         ],
+    "iceSpikes": [ #spikes
+    ],
+    "end": (35000, 780), # end flag
+}
+
 levels = { # levels
     0: level0, #level 0
     1: level1, # level 1
+    2: level2,
+    3: level3,
 }
 
 class Level:
@@ -270,6 +333,10 @@ class Level:
         for spike in specs["spikes"]:                      # For each position in the spikes list.
             for x in range(spike[0], spike[1], 120):       # for the range of x positions in the spike set.
                 self._hazards.append(Spikes(x, spike[2]))  # Create a set of spikes.
+
+        for IceSpike in specs["iceSpikes"]:                      # For each position in the spikes list.
+            for x in range(IceSpike[0], IceSpike[1], 120):       # for the range of x positions in the spike set.
+                self._hazards.append(IceSpikes(x, IceSpike[2]))  # Create a set of spikes.
 
         self._environment.append(EndFlag(specs["end"][0], specs["end"][1]))  # Create the end flag.
 
