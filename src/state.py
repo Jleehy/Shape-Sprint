@@ -92,7 +92,15 @@ class GameState:
         # Load instructions asset
         self._instructions_image = Image("assets/instructions.png")  # Load the instructions image.
         self._settings = Image("assets/settings.png")                # Load the settings image.
-        self._background_image = Image("assets/background.png")  # Load the background
+        if level_id == 0:    
+            self._background_image = Image("assets/background.png")  # Load the background
+        elif level_id == 1:
+            self._background_image = Image("assets/background2.png")  # Load the background
+        elif level_id == 2:
+            self._background_image = Image("assets/background3.png")  # Load the background
+        elif level_id == 3:
+            self._background_image = Image("assets/background4.png")  # Load the background
+
 
         self._ctr = 0 # counter
 
@@ -113,7 +121,7 @@ class GameState:
                 self._startpoint = [obj._base_x, obj._base_y, obj._acceleration]  # Update the startpoint.
             elif isinstance(obj, EndFlag):
                 engine_instance.state = GameOverState(self._level, self._cube, self._startpoint, 0)  # The user won.
-            elif isinstance(obj, Spikes):
+            elif isinstance(obj, (Spikes, IceSpikes)):
                 engine_instance.state = GameOverState(self._level, self._cube, self._startpoint, 1)  # The user lost.
             else:
                 self.is_on_ground = True  # Assume any non-flag collision indicates the cube is on the ground.
@@ -224,7 +232,7 @@ class OptionsMenuState(BaseMenuState):
 # Level select menu state with custom select_option logic.
 class LevelSelectMenuState(BaseMenuState):
     def __init__(self, last_key_time): # init
-        options = ["Back", "Level 1", "Level 2"] # options list
+        options = ["Back", "Level 1", "Level 2", "Level 3", "Level 4"] # options list
         super().__init__(options, "assets/levelMenuBackground.png", last_key_time) # super w/ info
 
     def select_option(self): # selection list
@@ -237,6 +245,12 @@ class LevelSelectMenuState(BaseMenuState):
         elif self.selected_option == 2: # if 2
             self.select_sound.play() # Play click1 sound on selection
             engine_instance.state = GameState(1)  # Start at Level 2 (1)
+        elif self.selected_option == 3: # if 3
+            self.select_sound.play() # Play click1 sound on selection
+            engine_instance.state = GameState(2)  # Start at Level 3 (2)
+        elif self.selected_option == 4: # if 4
+            self.select_sound.play() # Play click1 sound on selection
+            engine_instance.state = GameState(3)  # Start at Level 4 (3)
 
 # Main menu state for in-game pause menu.
 class MainMenuState(BaseMenuState):
