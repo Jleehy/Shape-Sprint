@@ -55,11 +55,12 @@ Known Faults:
     - The cube can sometimes faze into the ground after landing from jumps. This doesn't affect gameplay, just visuals.
 """
 
-
 from object import Object, TILE_SIZE
 
 SCREEN_WIDTH = 1600
 SCREEN_HEIGHT = 800
+
+TOLERANCE = 1
 
 HORIZONTAL_TILES = int(SCREEN_WIDTH / TILE_SIZE) - 1
 VERTICAL_TILES = int(SCREEN_HEIGHT / TILE_SIZE) - 1
@@ -68,51 +69,52 @@ GROUND_LEVEL = VERTICAL_TILES - 2
 
 # A Cube is an Object which represents the playable entity in the game.
 class Cube(Object):
-    # Initializes a Cube with the image path, size and position.
+    # Initializes a Cube with the image path, size, and position.
     def __init__(self):
         """
         Initializes a Cube object.
         """
-        super().__init__("assets/cube.png", 4, GROUND_LEVEL, TILE_SIZE, TILE_SIZE) #supers init
+        super().__init__("assets/cube.png", 4, GROUND_LEVEL, TILE_SIZE, TILE_SIZE)  # super's init
 
     # Moves the Cube and handles collisions.
     def move(self, y, level):
         """
-        Moves the Cube and handles collisions.
+        Updates the Cube's state and handles collisions with moving level objects.
         """
-        collision_checks = {'top': False, 'bottom': False, 'left': False, 'right': False} # Track collisions on each side.
-        collides_with = [] # List of objects the Cube collides with.
-            
-        collision_list = level.get_collisions(self) # Get objects colliding with Cube after a horizontal movement.
-
-        # Handle horizontal collisions.
-        for obj in collision_list: #iterate over objects
-            if not (isinstance(obj, Ground) or isinstance(obj, CheckpointFlag) or isinstance(obj, EndFlag)): #only handle collisions for objects that shouldnt be moved through
-                self._rect.right = obj._rect.left  # Push cube back to the left edge of the object
-                collision_checks['right'] = True # Update right-side collision.
-            collides_with.append(obj) # Add object to list of objects the Cube collides with.
-            
-        #self._rect.y += y # Update the Cube's vertical position.
-        collision_list = level.get_collisions(self) # Get objects colliding with Cube after a vertical movement.
+        collision_checks = {'top': False, 'bottom': False, 'left': False, 'right': False}  # Track collisions on each side.
+        collides_with = []  # List of objects the Cube collides with.
         
-        # Handle vertical collisions
-        for obj in collision_list: #iterate over objects
-            if not (isinstance(obj, CheckpointFlag) or isinstance(obj, EndFlag)): #only handle collisions for objects that shouldnt be moved through
-                if y > 0:  # Moving down
-                    self._rect.bottom = obj._rect.top  # Snap to the top of the object
-                    collision_checks['bottom'] = True # Update bottom-side collision.
-                elif self._rect.top > obj._rect.top:  # Moving up
-                    self._rect.top = obj._rect.bottom  # Snap to the bottom of the object
-                    collision_checks['top'] = True # Update top-side collision.
-            collides_with.append(obj) # Add object to list of objects the Cube collides with.
+        expanded_cube_rect = self._rect.inflate(TOLERANCE, TOLERANCE)
 
-        for obj in level._environment: #move every object in the environment list
-            obj.move_object(y) #move each object
+        # Move all level objects first.
+        for obj in level._environment:
+            obj.scroll_object(y)
+        for hazard in level._hazards:
+            hazard.scroll_object(y)
+    
+        # Handle horizontal collisions.
+        collision_list = level.get_collisions(self)  # Check collisions after objects have moved.
+        for obj in collision_list:
+            if not isinstance(obj, CheckpointFlag) and not isinstance(obj, EndFlag):  # Skip phaseable objects.
+                if abs(self._rect.bottom - obj._rect.top) > TOLERANCE*48:
+                    if self._rect.right > obj._rect.left:  # Moving right into an object.
+                        collision_checks['right'] = True
+                        self._rect.right = obj._rect.left
+            collides_with.append(obj)
+            collision_list.remove(obj)
+        
+        # Handle vertical collisions.
+        for obj in collision_list:
+            if not isinstance(obj, CheckpointFlag) and not isinstance(obj, EndFlag):  # Skip phaseable objects.
+                if y >= 0 and expanded_cube_rect.bottom > obj._rect.top:
+                    collision_checks['bottom'] = True
+                    self._rect.bottom = obj._rect.top
+                elif expanded_cube_rect.top < obj._rect.bottom:
+                    collision_checks['top'] = True
+                    self._rect.top = obj._rect.bottom
+            collides_with.append(obj)
 
-        for hazard in level._hazards: #move every object in the hazard list
-            hazard.move_object(y) # move each hazard
-
-        return collision_checks, collides_with # Return collision data.
+        return collision_checks, collides_with
 
 class Ground(Object): #class for ground
     def __init__(self, x, y, id):
@@ -214,6 +216,7 @@ level0 = {
     "id": 0,
     "ground": (-10, 200),
     "platforms": [
+        (20, 28, GROUND_LEVEL - 2),
         (110, 112, GROUND_LEVEL - 2),
         (120, 122, GROUND_LEVEL - 4),
     ],
@@ -221,8 +224,6 @@ level0 = {
         (80, GROUND_LEVEL - 1)
     ],
     "spikes":[
-        (20, 22, GROUND_LEVEL),
-        (30, 32, GROUND_LEVEL),
         (40, 42, GROUND_LEVEL),
         (50, 52, GROUND_LEVEL),
         (108, 124, GROUND_LEVEL)
@@ -367,8 +368,14 @@ class Level:
         Returns a list of objects colliding with the cube.
         """
         collision_list = []                               # List of objects colliding with the Cube.
+
+        # Expand the cube's rect and each object's rect by the tolerance
+        expanded_cube_rect = cube._rect.inflate(TOLERANCE, TOLERANCE)
+
         for object in self._environment + self._hazards:  # For each object in the level.
-            if cube._rect.colliderect(object._rect):      # If the object collides with the cube.
-                collision_list.append(object)             # Add it to the collision list.
+            # Expand the object's rect by the tolerance
+            # If the expanded rectangles collide (or touch)
+            if expanded_cube_rect.colliderect(object._rect):
+                collision_list.append(object)  # Add it to the collision list.
 
         return collision_list  # Return the collision list.

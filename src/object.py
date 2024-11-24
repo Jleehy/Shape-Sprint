@@ -38,6 +38,7 @@ Known Faults:
 import pygame
 
 from image import Image
+from engine import engine_instance  # Import the engine singleton instance.
 
 TILE_SIZE = 80
 
@@ -63,21 +64,21 @@ class Object:
         """
         self._image.blit(self._rect.x, self._rect.y)  # Blit the object
 
-    def draw_hitbox(self, screen, color=(255, 0, 0)):
+    def draw_hitbox(self, color=(255, 0, 0)):
         """
         Draws the outline of the hitbox.
         """
-        pygame.draw.rect(screen, color, self._rect, 2)  # Draw the hitbox rect.
+        pygame.draw.rect(engine_instance.screen, color, self._rect, 2)  # Draw the hitbox rect.
 
-    def move_object(self, dy):
+    def scroll_object(self, dy):
         """
         Moves the object the specified number of pixels.
         """
         self._rect.x -= self._speed  # move the object left.  
-        self._rect.y -= dy
+        self._rect.y -= dy # move the object vertically
 
-    def move_x(self, amount):
+    def move_x(self, x):
         """
-        Shifts the objects left.
+        Shifts the objects vertically.
         """
-        self._rect.x -= amount  # Move x coord
+        self._rect.x += x  # Move y coord
