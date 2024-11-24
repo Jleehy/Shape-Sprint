@@ -14,6 +14,7 @@ Revisions:
     Nov 9, 2024: Moved the Object class out of test.py - Sean Hammell
     Nov 9, 2024: Adjust how movement is handled such that the player is tracked vertically - Jacob Leehy
     Nov 10, 2024: Add more comments - Jacob Leehy
+    Nov 23, 2024: Removed acceleration and added TILE_SIZE support - Sean Hammell
 Preconditions:
     - Requires the Pygame library for rendering and collision detection.
     - `image.py` module must define an `Image` class for handling image loading and rendering.
@@ -38,6 +39,8 @@ import pygame
 
 from image import Image
 
+TILE_SIZE = 80
+
 class Object:
     """
     Objects represent visual game entities.
@@ -46,16 +49,13 @@ class Object:
         """
         Initializes an Object given the path to an image, a position, and a size.
         """
-        self._image = Image(image_path)                # Create an Image object given image_path.
-        self._base_x = x                               # Store the original x position of the object (constant).
-        self._base_y = y                               # Store the original y position of the object (constant).
-        self._x = x                                    # Store the x position of the object.
-        self._y = y                                    # Store the y position of the object.
-        self._width = width                            # Store the width (pixels) of the object.
-        self._height = height                          # Store the height (pixels) of the object.
-        self._rect = pygame.Rect(x, y, width, height)  # Store the hitbox of the object.
-        self._counter = 0                              # Counter to be used in calculating acceleration over time.
-        self._acceleration = 0                         # Value to store the current speed increace from acceleration.
+        self._image = Image(image_path)                                        # Create an Image object given image_path.
+        self._base_x = x                                                       # Store the original x position of the object (constant).
+        self._base_y = y                                                       # Store the original y position of the object (constant).
+        self._width = width                                                    # Store the width (pixels) of the object.
+        self._height = height                                                  # Store the height (pixels) of the object.
+        self._rect = pygame.Rect(x * TILE_SIZE, y * TILE_SIZE, width, height)  # Store the hitbox of the object.
+        self._speed = int(TILE_SIZE / 5)                                       # Movement speed.
 
     def draw(self):
         """
@@ -69,34 +69,13 @@ class Object:
         """
         pygame.draw.rect(screen, color, self._rect, 2)  # Draw the hitbox rect.
 
-    def get_position(self):
-        """
-        Returns the position of the object as a tuple (x, y).
-        """
-        return self._x, self._y  # Return the position components.
-
-    def get_size(self):
-        """
-        Returns the size of the object as a tuple (width, height).
-        """
-        return self._width, self._height  # Return size dimensions.
-
-    def move_object(self, xamount, yammount=0):
+    def move_object(self, dy):
         """
         Moves the object the specified number of pixels.
         """
-        self._counter += 1           # Increment counter.
-        if self._counter == 20:      # If 60 frames have passed.
-            self._counter = 0        # Reset frame count.
-            self._acceleration += 1  # Increment acceleration.
+        self._rect.x -= self._speed  # move the object left.  
+        self._rect.y -= dy
 
-        self._rect.x -= xamount + 10 + self._acceleration  # move the object left.  
-        self._rect.y -= yammount
-
-        # Update _x and _y to match the new rect position for consistency.
-        self._x = self._rect.x
-        self._y = self._rect.y
-        
     def move_x(self, amount):
         """
         Shifts the objects left.

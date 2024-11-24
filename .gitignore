@@ -1,3 +1,3 @@
 __pycache__/
-.venv
-tempCodeRunnerFile.py
+.DS_Store
+*.aseprite

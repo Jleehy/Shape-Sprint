@@ -14,6 +14,7 @@ Revisions:
     Oct 24, 2024: Modularized engine class - Matthew Sullivan
     Oct 27, 2024: Finalized prologue comments - Sean Hammell
     Nov 10, 2024: Fixed circular import dependency on states and engine. - Mario Simental
+    Nov 23, 2024: Update resolution - Sean Hammell
 Preconditions:
     The Pygame library is available.
     The Keyboard class is defined.
@@ -46,9 +47,9 @@ class Engine:
         # Initialize pygame.
         pygame.init()
 
-        # Create an 800x600 window with the title "Shape Sprint".
+        # Create an 1600x800 window with the title "Shape Sprint".
         pygame.display.set_caption("Shape Sprint")
-        self.screen = pygame.display.set_mode((1600, 1200), flags=pygame.SCALED, vsync=1)
+        self.screen = pygame.display.set_mode((1600, 800), flags=pygame.SCALED, vsync=1)
 
         # Start with an empty state.
         self.state = None

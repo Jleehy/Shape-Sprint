@@ -26,6 +26,7 @@ Revisions:
     Nov 10, 2024: Added Cube object into level.py - Mario Simental
     Nov 10, 2024: Redesign level 0 and add level 1 - Jacob Leehy
     Nov 11, 2024: Added gravity inverter object - Matthew Sullivan
+    Nov 23, 2024: Updated Level and level0 to be tile-based - Sean Hammell
 
 Preconditions:
     - Assets such as cube.png, ground.png, platform.png, checkpoint.png, end.png, and spikes.png exist
@@ -55,19 +56,27 @@ Known Faults:
 """
 
 
-from object import Object
+from object import Object, TILE_SIZE
+
+SCREEN_WIDTH = 1600
+SCREEN_HEIGHT = 800
+
+HORIZONTAL_TILES = int(SCREEN_WIDTH / TILE_SIZE) - 1
+VERTICAL_TILES = int(SCREEN_HEIGHT / TILE_SIZE) - 1
+
+GROUND_LEVEL = VERTICAL_TILES - 2
 
 # A Cube is an Object which represents the playable entity in the game.
 class Cube(Object):
     # Initializes a Cube with the image path, size and position.
-    def __init__(self, startpoint):
+    def __init__(self):
         """
         Initializes a Cube object.
         """
-        super().__init__("assets/cube.png", 130, startpoint[1], 120, 120) #supers init
+        super().__init__("assets/ctile.png", 4, GROUND_LEVEL, TILE_SIZE, TILE_SIZE) #supers init
 
     # Moves the Cube and handles collisions.
-    def move(self, x, y, level):
+    def move(self, y, level):
         """
         Moves the Cube and handles collisions.
         """
@@ -78,13 +87,9 @@ class Cube(Object):
 
         # Handle horizontal collisions.
         for obj in collision_list: #iterate over objects
-            if not (isinstance(obj, CheckpointFlag) or isinstance(obj, EndFlag)): #only handle collisions for objects that shouldnt be moved through
-                if x > 0:  # Moving right
-                    self._rect.right = obj._rect.left  # Push cube back to the left edge of the object
-                    collision_checks['right'] = True # Update right-side collision.
-                elif x < 0:  # Moving left
-                    self._rect.left = obj._rect.right  # Push cube back to the right edge of the object
-                    collision_checks['left'] = True # Update left-side collision.
+            if not (isinstance(obj, Ground) or isinstance(obj, CheckpointFlag) or isinstance(obj, EndFlag)): #only handle collisions for objects that shouldnt be moved through
+                self._rect.right = obj._rect.left  # Push cube back to the left edge of the object
+                collision_checks['right'] = True # Update right-side collision.
             collides_with.append(obj) # Add object to list of objects the Cube collides with.
             
         #self._rect.y += y # Update the Cube's vertical position.
@@ -101,11 +106,11 @@ class Cube(Object):
                     collision_checks['top'] = True # Update top-side collision.
             collides_with.append(obj) # Add object to list of objects the Cube collides with.
 
-        for platform in level._environment: #move every object in the environment list
-            platform.move_object(x, y) #move each platform
+        for obj in level._environment: #move every object in the environment list
+            obj.move_object(y) #move each object
 
         for hazard in level._hazards: #move every object in the hazard list
-            hazard.move_object(x, y) # move each hazard
+            hazard.move_object(y) # move each hazard
 
         return collision_checks, collides_with # Return collision data.
 
@@ -114,35 +119,35 @@ class Ground(Object): #class for ground
         """
         Initializes a ground tile.
         """
-        super().__init__("assets/ground.png", x, y, 800, 150) #supers with dimensions
+        super().__init__("assets/gtile.png", x, y, TILE_SIZE, TILE_SIZE) #supers with dimensions
 
 class Platform(Object): # class for platform
     def __init__(self, x, y):
         """
         Initializes a platform tile.
         """
-        super().__init__("assets/platform.png", x, y, 200, 25)#supers with dimensions
+        super().__init__("assets/ptile.png", x, y, TILE_SIZE, TILE_SIZE)#supers with dimensions
 
 class CheckpointFlag(Object): #class for checkpoint
     def __init__(self, x, y):
         """
         Initializes a flag to serve as a mid-level checkpoint.
         """
-        super().__init__("assets/checkpoint.png", x, y, 60, 120)#supers with dimensions
+        super().__init__("assets/chtile.png", x, y, TILE_SIZE, TILE_SIZE * 2)#supers with dimensions
 
 class EndFlag(Object): #class for end flag
     def __init__(self, x, y):
         """
         Initializes a flag to signify the end of a level.
         """
-        super().__init__("assets/end.png", x, y, 60, 120)#supers with dimensions
+        super().__init__("assets/etile.png", x, y, TILE_SIZE, TILE_SIZE * 2)#supers with dimensions
 
 class Spikes(Object): # class for spikes
     def __init__(self, x, y):
         """
         Initializes a hazardous spikes tile.
         """
-        super().__init__("assets/spikes.png", x, y, 120, 120)#supers with dimensions
+        super().__init__("assets/stile.png", x, y, TILE_SIZE, TILE_SIZE)#supers with dimensions
 
 class IceSpikes(Object): # class for spikes
     def __init__(self, x, y):
@@ -182,38 +187,26 @@ A note on the level specifications:
     'end' stores the (x, y) position of the end flag
 """
 
-# Enhanced Tutorial level layout specification for a more interesting Level 0.
+# # Enhanced Tutorial level layout specification for a more interesting Level 0.
 level0 = {
-    "id": 0, # level id
-    "ground": (-240, 30000),  # Extended ground length to 25,000 units
-    "platforms": [], # platforms list
-    "checkpoints": [ # checkpoint list
-        (5000, 780), # new checkpoint
-        (20000, 780),  # New checkpoint added
+    "id": 0,
+    "ground": (-10, 200),
+    "platforms": [
+        (110, 112, GROUND_LEVEL - 2),
+        (120, 122, GROUND_LEVEL - 4),
     ],
-    
-    "spikes": [ # list for spikes
-        (700, 820, 780),  #spikes
-        (1600, 1720, 780), #spikes
-        (2500, 2600, 780), #spikes
-        (3700, 3820, 780), #spikes
-        (6000, 6120, 780), #spikes
-        (9200, 9320, 780), #spikes
-        (9800, 9920, 780), #spikes
-        (11000, 11120, 780), #spikes
-        (12500, 12620, 780), #spikes
-        (13200, 13320, 780), #spikes
-        (14500, 15340, 780), #spikes
-        (16800, 16920, 780), #spikes
-        (18500, 18620, 780), #spikes
-        (19500, 19620, 780),  # New spike segment after the 20,000 checkpoint
-        (23000, 24200, 780), #spikes
+    "checkpoints": [
+        (80, GROUND_LEVEL - 1)
     ],
-    "iceSpikes": [ #spikes
+    "spikes":[
+        (20, 22, GROUND_LEVEL),
+        (30, 32, GROUND_LEVEL),
+        (40, 42, GROUND_LEVEL),
+        (50, 52, GROUND_LEVEL),
+        (108, 124, GROUND_LEVEL)
     ],
-    "end": (29000, 780),  # Moved end to 24,500 to complete the longer level
+    "end": (160, GROUND_LEVEL - 1)
 }
-
 
 # Level 1 layout specification.
 level1 = {
@@ -228,9 +221,6 @@ level1 = {
         (8900, 750), #platforms
         (10400, 550), #platforms
         (11900, 350), #platforms
-
-
-        
     ],
     "checkpoints": [(17400, 780)], #checkpoint
     "spikes": [ #spikes
@@ -265,9 +255,6 @@ level2 = {
         (8900, 750), #platforms
         (10400, 550), #platforms
         (11900, 350), #platforms
-
-
-        
     ],
     "checkpoints": [(17400, 780)], #checkpoint
     "spikes": [ #spikes
@@ -290,9 +277,6 @@ level3 = {
     "id": 3, # level id
     "ground": (-240, 40000), # ground range
     "platforms": [
-
-
-        
     ],
     "checkpoints": [(17400, 780)], #checkpoint
     "spikes": [ #spikes
@@ -321,45 +305,35 @@ class Level:
         self._environment = []  # Create an empty environment list.
         self._hazards = []      # Create an empty hazards list.
 
-        for x in range(specs["ground"][0], specs["ground"][1], 120):  # For the range of x positions in the ground list.
-            self._environment.append(Ground(x, 900))                  # Create a ground tile.
+        for x in range(specs["ground"][0], specs["ground"][1]):  # For the range of x positions in the ground list.
+            for i in range(-1, GROUND_LEVEL):
+                self._environment.append(Ground(x, VERTICAL_TILES + i))                  # Create a ground tile.
 
-        for platform in specs["platforms"]:                               # For each position in the platform list.
-            self._environment.append(Platform(platform[0], platform[1]))  # Create a platform.
-        
+        for group in specs["platforms"]:                               # For each position in the platform list.
+            for x in range(group[0], group[1]):
+                self._environment.append(Platform(x, group[2]))  # Create a platform.
+
         for checkpoint in specs["checkpoints"]:                                     # For each position in the checkpoint list.
             self._environment.append(CheckpointFlag(checkpoint[0], checkpoint[1]))  # Create a checkpoint flag.
 
-        for spike in specs["spikes"]:                      # For each position in the spikes list.
-            for x in range(spike[0], spike[1], 120):       # for the range of x positions in the spike set.
-                self._hazards.append(Spikes(x, spike[2]))  # Create a set of spikes.
+        for group in specs["spikes"]:                      # For each position in the spikes list.
+            for x in range(group[0], group[1]):       # for the range of x positions in the spike set.
+                self._hazards.append(Spikes(x, group[2]))  # Create a set of spikes.
 
-        for IceSpike in specs["iceSpikes"]:                      # For each position in the spikes list.
-            for x in range(IceSpike[0], IceSpike[1], 120):       # for the range of x positions in the spike set.
-                self._hazards.append(IceSpikes(x, IceSpike[2]))  # Create a set of spikes.
+        # for IceSpike in specs["iceSpikes"]:                      # For each position in the spikes list.
+        #     for x in range(IceSpike[0], IceSpike[1], 120):       # for the range of x positions in the spike set.
+        #         self._hazards.append(IceSpikes(x, IceSpike[2]))  # Create a set of spikes.
 
         self._environment.append(EndFlag(specs["end"][0], specs["end"][1]))  # Create the end flag.
 
         for obj in self._environment + self._hazards:    # For each environment object.
-            obj.move_x(start)                            # Offset it to the start position.
-
-    def get_environment(self):
-        """
-        Returns the environment tiles.
-        """
-        return self._environment
-
-    def get_hazards(self):
-        """
-        Returns the hazard tiles.
-        """
-        return self._hazards
+            obj.move_x(start[0] * TILE_SIZE)                            # Offset it to the start position.
 
     def draw(self):
         """
         Draws all environment and hazard objects.
         """
-        for obj in self._environment + self._hazards: #iterate over environment anf hazards
+        for obj in self._environment + self._hazards: #iterate over environment and hazards
             obj.draw() # draw everything
 
     def get_collisions(self, cube):

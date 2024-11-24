@@ -17,6 +17,7 @@ Revisions:
     Nov 10, 2024: Modularized states and further abstracted menu related states. - Mario Simental
     Nov 10, 2024: Add comments - Jacob Leehy
     Nov 11, 2024: Added click sound asset to selections - Matthew Sullivan
+    Nov 23, 2024: Updated GameState for tile-based level changes - Sean Hammell
 Preconditions:
     Requires Pygame and imported dependencies (engine, Image, SoundEffect, etc.) to function.
 Postconditions:
@@ -60,18 +61,11 @@ class State:
 # GameState manages the main gameplay, handling Cube movement, collisions, and rendering.
 class GameState:
     # Initializes GameState, setting up Cube, Level, and other parameters.
-    def __init__(self, level_id = 0, startpoint=[130, 780, 0]):
+    def __init__(self, level_id = 0, startpoint=[0, GROUND_LEVEL]):
         # Initialize objects.
         self._startpoint = startpoint # startpoint var to be used w/ checkpoints
-        self._cube = Cube(startpoint) # Store the Cube data.
-        self._level = Level(levels[level_id], startpoint[0] - 130) # Store the Level data.
-
-        if startpoint[2] != 0:
-            for platform in self._level._environment: #move every object in the environment list
-                platform._acceleration = startpoint[2] #move each platform
-
-            for hazard in self._level._hazards: #move every object in the hazard list
-                hazard._acceleration = startpoint[2] # move each hazard
+        self._cube = Cube() # Store the Cube data.
+        self._level = Level(levels[level_id], startpoint) # Store the Level data.
 
         # Initialize physics.
         self._gravity = 1  # Store the gravity data.
@@ -118,7 +112,7 @@ class GameState:
         collisions = self._level.get_collisions(self._cube)                               # Get all collisions.
         for obj in collisions:
             if isinstance(obj, CheckpointFlag):
-                self._startpoint = [obj._base_x, obj._base_y, obj._acceleration]  # Update the startpoint.
+                self._startpoint = [obj._base_x - 4, obj._base_y + 1]  # Update the startpoint.
             elif isinstance(obj, EndFlag):
                 engine_instance.state = GameOverState(self._level, self._cube, self._startpoint, 0)  # The user won.
             elif isinstance(obj, (Spikes, IceSpikes)):
@@ -138,7 +132,7 @@ class GameState:
             self._vertical_velocity = self._jump_strength                          # Set initial jump velocity.
             self.is_jumping = True                                                 # Set that the cube is in the air.
 
-        collisions, collides_with = self._cube.move(self._cube._acceleration, self._vertical_velocity, self._level)  # Move the cube.
+        collisions, collides_with = self._cube.move(self._vertical_velocity, self._level)  # Move the cube.
 
         """NOTE: If gravity is inverted we will need to check if top surface is collided with."""
         if collisions['bottom']:         # If the cube is colliding with something under it.
@@ -239,18 +233,9 @@ class LevelSelectMenuState(BaseMenuState):
         if self.selected_option == 0: # if 0
             self.select_sound.play() # Play click1 sound on selection
             engine_instance.state = OpeningMenuState(self.last_key_time) # return to opening menu
-        elif self.selected_option == 1: # if 1
+        else:
             self.select_sound.play() # Play click1 sound on selection
-            engine_instance.state = GameState()  # Start at Level 1 (0)
-        elif self.selected_option == 2: # if 2
-            self.select_sound.play() # Play click1 sound on selection
-            engine_instance.state = GameState(1)  # Start at Level 2 (1)
-        elif self.selected_option == 3: # if 3
-            self.select_sound.play() # Play click1 sound on selection
-            engine_instance.state = GameState(2)  # Start at Level 3 (2)
-        elif self.selected_option == 4: # if 4
-            self.select_sound.play() # Play click1 sound on selection
-            engine_instance.state = GameState(3)  # Start at Level 4 (3)
+            engine_instance.state = GameState(self.select_option)  # Start at the selected level
 
 # Main menu state for in-game pause menu.
 class MainMenuState(BaseMenuState):
