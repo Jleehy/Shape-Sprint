@@ -73,7 +73,7 @@ class Cube(Object):
         """
         Initializes a Cube object.
         """
-        super().__init__("assets/ctile.png", 4, GROUND_LEVEL, TILE_SIZE, TILE_SIZE) #supers init
+        super().__init__("assets/cube.png", 4, GROUND_LEVEL, TILE_SIZE, TILE_SIZE) #supers init
 
     # Moves the Cube and handles collisions.
     def move(self, y, level):
@@ -115,46 +115,68 @@ class Cube(Object):
         return collision_checks, collides_with # Return collision data.
 
 class Ground(Object): #class for ground
-    def __init__(self, x, y):
+    def __init__(self, x, y, id):
         """
         Initializes a ground tile.
         """
-        super().__init__("assets/gtile.png", x, y, TILE_SIZE, TILE_SIZE) #supers with dimensions
+        if id == 0:
+            super().__init__("assets/ground.png", x, y, TILE_SIZE, TILE_SIZE) #supers with dimensions
+        elif id == 1:
+            super().__init__("assets/lvl2Ground.png", x, y, TILE_SIZE, TILE_SIZE) #supers with dimensions
+        elif id == 2:
+            super().__init__("assets/sandGround.png", x, y, TILE_SIZE, TILE_SIZE) #supers with dimensions
+        elif id == 3:
+            super().__init__("assets/iceGround.png", x, y, TILE_SIZE, TILE_SIZE) #supers with dimensions
+
+class GroundLower(Object): #class for ground
+    def __init__(self, x, y, id):
+        """
+        Initializes a ground tile.
+        """
+        if id == 0:
+            super().__init__("assets/groundLower.png", x, y, TILE_SIZE, TILE_SIZE) #supers with dimensions
+        elif id == 1:
+            super().__init__("assets/lvl2GroundLower.png", x, y, TILE_SIZE, TILE_SIZE) #supers with dimensions
+        elif id == 2:
+            super().__init__("assets/sandGroundLower.png", x, y, TILE_SIZE, TILE_SIZE) #supers with dimensions
+        elif id == 3:
+            super().__init__("assets/iceGroundLower.png", x, y, TILE_SIZE, TILE_SIZE) #supers with dimensions
 
 class Platform(Object): # class for platform
     def __init__(self, x, y):
         """
         Initializes a platform tile.
         """
-        super().__init__("assets/ptile.png", x, y, TILE_SIZE, TILE_SIZE)#supers with dimensions
+        super().__init__("assets/platform.png", x, y, TILE_SIZE, TILE_SIZE)#supers with dimensions
 
 class CheckpointFlag(Object): #class for checkpoint
     def __init__(self, x, y):
         """
         Initializes a flag to serve as a mid-level checkpoint.
         """
-        super().__init__("assets/chtile.png", x, y, TILE_SIZE, TILE_SIZE * 2)#supers with dimensions
+        super().__init__("assets/checkpoint.png", x, y, TILE_SIZE, TILE_SIZE * 2)#supers with dimensions
 
 class EndFlag(Object): #class for end flag
     def __init__(self, x, y):
         """
         Initializes a flag to signify the end of a level.
         """
-        super().__init__("assets/etile.png", x, y, TILE_SIZE, TILE_SIZE * 2)#supers with dimensions
+        super().__init__("assets/end.png", x, y, TILE_SIZE, TILE_SIZE * 2)#supers with dimensions
 
 class Spikes(Object): # class for spikes
-    def __init__(self, x, y):
+    def __init__(self, x, y, id):
         """
         Initializes a hazardous spikes tile.
         """
-        super().__init__("assets/stile.png", x, y, TILE_SIZE, TILE_SIZE)#supers with dimensions
+        if id == 0:
+            super().__init__("assets/spikes.png", x, y, TILE_SIZE, TILE_SIZE) #supers with dimensions
+        elif id == 1:
+            super().__init__("assets/lvl2Spikes.png", x, y, TILE_SIZE, TILE_SIZE) #supers with dimensions
+        elif id == 2:
+            super().__init__("assets/sandSpikes.png", x, y, TILE_SIZE, TILE_SIZE) #supers with dimensions
+        elif id == 3:
+            super().__init__("assets/iceSpikes.png", x, y, TILE_SIZE, TILE_SIZE) #supers with dimensions
 
-class IceSpikes(Object): # class for spikes
-    def __init__(self, x, y):
-        """
-        Initializes a hazardous spikes tile.
-        """
-        super().__init__("assets/iceSpikes.png", x, y, 120, 120)#supers with dimensions
 
 
 class InvertGravity(Object):
@@ -306,8 +328,12 @@ class Level:
         self._hazards = []      # Create an empty hazards list.
 
         for x in range(specs["ground"][0], specs["ground"][1]):  # For the range of x positions in the ground list.
-            for i in range(-1, GROUND_LEVEL):
-                self._environment.append(Ground(x, VERTICAL_TILES + i))                  # Create a ground tile.
+            for i in range(-1, 3):
+                if i == -1:
+                    self._environment.append(Ground(x, VERTICAL_TILES + i, self.id))                  # Create a ground tile.
+                else:
+                    self._environment.append(GroundLower(x, VERTICAL_TILES + i, self.id))                  # Create a lower ground tile.
+
 
         for group in specs["platforms"]:                               # For each position in the platform list.
             for x in range(group[0], group[1]):
@@ -318,7 +344,7 @@ class Level:
 
         for group in specs["spikes"]:                      # For each position in the spikes list.
             for x in range(group[0], group[1]):       # for the range of x positions in the spike set.
-                self._hazards.append(Spikes(x, group[2]))  # Create a set of spikes.
+                self._hazards.append(Spikes(x, group[2], self.id))  # Create a set of spikes.
 
         # for IceSpike in specs["iceSpikes"]:                      # For each position in the spikes list.
         #     for x in range(IceSpike[0], IceSpike[1], 120):       # for the range of x positions in the spike set.
