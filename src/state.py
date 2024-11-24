@@ -150,7 +150,7 @@ class GameState:
 
 # Base class for menu states to centralize common functionality.
 class BaseMenuState(State):
-    def __init__(self, options, background_path, last_key_time, font_large_size=72, font_small_size=110): # init
+    def __init__(self, options, background_path, last_key_time, font_large_size=72, font_small_size=95): # init
         self.font_large = pygame.font.SysFont(None, font_large_size) # Create a large font.
         self.font_small = pygame.font.SysFont(None, font_small_size) # Create a snakk font.
         self.options = options # Set the available options.
@@ -183,9 +183,9 @@ class BaseMenuState(State):
         engine_instance.screen.blit(self._background_image, (0, 0)) # Set the background image.
 
         for index, option in enumerate(self.options): # Iterate through all possible options.
-            color = (255, 255, 0) if self.selected_option == index else (0, 0, 0) # Change button color if hovered.
+            color = (240, 86, 86) if self.selected_option == index else (0, 0, 0) # Change button color if hovered.
             option_surface = self.font_small.render(option, True, color) # Render the option as a button.
-            engine_instance.screen.blit(option_surface, (625, 400 + index * 100)) # Draw the button.
+            engine_instance.screen.blit(option_surface, (625, 400 + index * 75)) # Draw the button.
 
 # Opening menu state with custom select_option logic.
 class OpeningMenuState(BaseMenuState):
