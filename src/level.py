@@ -354,7 +354,7 @@ class Level:
         self._environment.append(EndFlag(specs["end"][0], specs["end"][1]))  # Create the end flag.
 
         for obj in self._environment + self._hazards:    # For each environment object.
-            obj.move_x(start[0] * TILE_SIZE)                            # Offset it to the start position.
+            obj.move_x(-1 * start[0] * TILE_SIZE)                            # Offset it to the start position.
 
     def draw(self):
         """
