@@ -115,7 +115,7 @@ class GameState:
                 self._startpoint = [obj._base_x - 4, obj._base_y + 1]  # Update the startpoint.
             elif isinstance(obj, EndFlag):
                 engine_instance.state = GameOverState(self._level, self._cube, self._startpoint, 0)  # The user won.
-            elif isinstance(obj, (Spikes, IceSpikes)):
+            elif isinstance(obj, Spikes):
                 engine_instance.state = GameOverState(self._level, self._cube, self._startpoint, 1)  # The user lost.
             else:
                 self.is_on_ground = True  # Assume any non-flag collision indicates the cube is on the ground.
@@ -183,9 +183,9 @@ class BaseMenuState(State):
         engine_instance.screen.blit(self._background_image, (0, 0)) # Set the background image.
 
         for index, option in enumerate(self.options): # Iterate through all possible options.
-            color = (255, 255, 0) if self.selected_option == index else (255, 255, 255) # Change button color if hovered.
+            color = (255, 255, 0) if self.selected_option == index else (0, 0, 0) # Change button color if hovered.
             option_surface = self.font_small.render(option, True, color) # Render the option as a button.
-            engine_instance.screen.blit(option_surface, (650, 600 + index * 100)) # Draw the button.
+            engine_instance.screen.blit(option_surface, (625, 400 + index * 100)) # Draw the button.
 
 # Opening menu state with custom select_option logic.
 class OpeningMenuState(BaseMenuState):
