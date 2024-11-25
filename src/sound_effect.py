@@ -12,6 +12,7 @@ Created:
     Oct 23, 2024
 Revisions:
     Oct 27, 2024: Finalized prologue comments - Sean Hammell
+    Nov 24, 2024: Added some code to allow the sound effect volume to be changed - Steve Gan
 Preconditions:
     The Pygame library is initialized.
     The file passed to the constructor is a valid .ogg or .wav file.
