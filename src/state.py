@@ -104,7 +104,7 @@ class GameState:
         """
         Updates the game based on input, movement, and sound control.
         """
-        if engine_instance.keyboard.is_key_down(pygame.K_ESCAPE):  # If escape is pressed.
+        if engine_instance.keyboard.is_key_down("esc"):  # If escape is pressed.
             engine_instance.state = MainMenuState(self)            # Go to the main menu
 
         was_in_air = not self.is_on_ground # Track whether Cube was in the air in the last frame, for landing detection.
@@ -116,25 +116,14 @@ class GameState:
                 engine_instance.state = GameOverState(self._level, self._cube, self._startpoint, 0)  # The user won.
             elif isinstance(obj, Spikes):
                 engine_instance.state = GameOverState(self._level, self._cube, self._startpoint, 1)  # The user lost.
-            elif isinstance(obj, InvertGravity):
-            # Handle gravity inversion.
-                if obj.activated == False:
-                    obj.activated = True
-                    if self._gravity > 0:  # If gravity is currently normal.
-                        self._gravity = -1
-                        self._vertical_velocity = -2  # Small nudge upwards to ensure movement.
-                    else:  # If gravity is currently inverted.
-                        self._gravity = 1
-                        self._vertical_velocity = 2  # Small nudge downwards to ensure movement.
-                    self.is_jumping = True
-                    self.is_on_ground = False
-                    print("Gravity inverted!")
+            else:
+                self.is_on_ground = True  # Assume any non-flag collision indicates the cube is on the ground.
 
-         # Handle jumping.
+         # Check if the up arrow key is pressed, the player is on the ground, and the jump cooldown has elapsed
         if engine_instance.keyboard.is_key_down(pygame.K_UP):
-            if self.is_on_ground and not self.is_jumping:  # Allow jumping only if on the ground and not already jumping.
-                self.is_jumping = True  # Mark that the cube is now in the air.
-                self.jump_frames = 0  # Reset jump frames at the start of a jump.
+            if self.is_on_ground and not self.is_jumping:  # Allow jumping only if on the ground and not already jumping
+                self.is_jumping = True  # Mark that the cube is now in the air
+                self.jump_frames = 0  # Reset jump frames at the start of a jump
 
             if self.is_jumping and self.jump_frames < 5:  # Continue adjusting velocity within a frame limit.
                 self.jump_frames += 1  # Increment jump frames.
@@ -200,13 +189,13 @@ class BaseMenuState(State):
         if current_time - self.last_key_time <= self.key_delay: # If enough time has elapsed since the last key press.
             return #return
 
-        if engine_instance.keyboard.is_key_down(pygame.K_DOWN): # If the down key is pressed.
+        if engine_instance.keyboard.is_key_down("down"): # If the down key is pressed.
             self.selected_option = (self.selected_option + 1) % len(self.options) # Cycle through the options.
             self.last_key_time = current_time # Record the time of the key press.
-        elif engine_instance.keyboard.is_key_down(pygame.K_UP): # If the up key is pressed.
+        elif engine_instance.keyboard.is_key_down("up"): # If the up key is pressed.
             self.selected_option = (self.selected_option - 1) % len(self.options) # Cycle through the options.
             self.last_key_time = current_time # Record the time of the key press.
-        elif engine_instance.keyboard.is_key_down(pygame.K_RETURN): # If the return key is pressed.
+        elif engine_instance.keyboard.is_key_down("select"): # If the return key is pressed.
             self.last_key_time = current_time # Record the time of the key press.
             self.select_sound.play() # Play click1 sound on selection
             self.select_option() # Select the option.
@@ -240,8 +229,24 @@ class OpeningMenuState(BaseMenuState):
         elif self.selected_option == 3: # if 3
             sys.exit() # exit
 
-# Options menu state with custom select_option logic.
 class OptionsMenuState(BaseMenuState):
+    def __init__(self, last_key_time): #init
+        options = ["Back", "Volume", "Key Binds"] #create options list
+        super().__init__(options, "assets/optionsMenuBackground.png", last_key_time)#load assets
+
+    def select_option(self):
+        if self.selected_option == 0: # if 0
+            self.select_sound.play() # Play click1 sound on selection
+            engine_instance.state = OpeningMenuState(self.last_key_time) # return to opening menu
+        elif self.selected_option == 1: # if 1
+            self.select_sound.play() # Play click1 sound on selection
+            engine_instance.state = SoundMenuState(self.last_key_time) #open sound menu
+        elif self.selected_option == 2: # if 2
+            self.select_sound.play() # Play click1 sound on selection
+            engine_instance.state = KeysMenuState(self.last_key_time) #open keys menu
+
+# Options menu state with custom select_option logic.
+class SoundMenuState(BaseMenuState):
     def __init__(self, last_key_time): # init
         options = ["Back", "Volume Up", "Volume Down"] # opptions list
         super().__init__(options, "assets/optionsMenuBackground.png", last_key_time) # load asset
@@ -249,13 +254,29 @@ class OptionsMenuState(BaseMenuState):
     def select_option(self): # option selector
         if self.selected_option == 0: # if 0
             self.select_sound.play() # Play click1 sound on selection
-            engine_instance.state = OpeningMenuState(self.last_key_time) # return to opening menu
+            engine_instance.state = OptionsMenuState(self.last_key_time) # return to options menu
         elif self.selected_option == 1: # if 1
             self.select_sound.play() # Play click1 sound on selection
             volume_up() # increace vol
         elif self.selected_option == 2: # if 2
             self.select_sound.play() # Play click1 sound on selection
             volume_down() # decreace vol
+
+class KeysMenuState(BaseMenuState):
+    def __init__(self, last_key_time): # init
+        options = ["Back", "Arrow Keys", "WASD"] # opptions list
+        super().__init__(options, "assets/optionsMenuBackground.png", last_key_time) # load asset
+
+    def select_option(self): # option selector
+        if self.selected_option == 0: # if 0
+            self.select_sound.play() # Play click1 sound on selection
+            engine_instance.state = OptionsMenuState(self.last_key_time) # return to options menu
+        elif self.selected_option == 1: # if 1
+            self.select_sound.play() # Play click1 sound on selection
+            engine_instance.keyboard.set_Arrows() #set the keybinds to the arrow keys
+        elif self.selected_option == 2: # if 2
+            self.select_sound.play() # Play click1 sound on selection
+            engine_instance.keyboard.set_WASD() #set the keybinds to the WASD keybinds
 
 # Level select menu state with custom select_option logic.
 class LevelSelectMenuState(BaseMenuState):
@@ -274,7 +295,7 @@ class LevelSelectMenuState(BaseMenuState):
 # Main menu state for in-game pause menu.
 class MainMenuState(BaseMenuState):
     def __init__(self, previous_state): #init
-        options = ["Continue", "Restart", "Quit"] # options list
+        options = ["Continue", "Restart", "Main Menu"] # options list
         super().__init__(options, "assets/mainMenuBackground.png", 0, font_large_size=72, font_small_size=110) # super and send info
         self.previous_state = previous_state # set prev state
 
@@ -287,7 +308,7 @@ class MainMenuState(BaseMenuState):
             engine_instance.state = GameState()  # Restart the game
         elif self.selected_option == 2: # if 2
             self.select_sound.play() # Play click1 sound on selection
-            sys.exit()  # Quit the game
+            engine_instance.state = OpeningMenuState(self.last_key_time)  # Return to the main menu
 
 class GameOverState(BaseMenuState): # game over menu
     def __init__(self, level, cube, startpoint, endstate, last_key_time=None): # init

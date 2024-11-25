@@ -13,6 +13,7 @@ Created:
 Revisions:
     Oct 27, 2024: Finalized prologue comments - Sean Hammell
     Nov 10, 2024: Added volume up and volume down - Steve Gan
+    Nov 24, 2024: Fixed bugs with music volume up and down - Steve Gan
 Preconditions:
     The Pygame library is initialized.
     The file passed to set_music is a valid .ogg or .wav file.
@@ -32,6 +33,8 @@ Known Faults:
 
 import pygame
 
+mus_vol = .05
+
 
 def set_music(file):
     """
@@ -39,6 +42,7 @@ def set_music(file):
     """
     # Load the music file.
     pygame.mixer.music.load(file)
+    pygame.mixer.music.set_volume(mus_vol)
 
 
 def play_music():
@@ -46,7 +50,6 @@ def play_music():
     Begins playing the music.
     """
     pygame.mixer.music.play(-1)
-    pygame.mixer.music.set_volume(.5)
 
 
 def pause_music():
@@ -64,7 +67,17 @@ def unpause_music():
 
 
 def volume_up():
-    pygame.mixer.music.set_volume(pygame.mixer.music.get_volume() + .1)
+    """
+    Turns music volume up
+    """
+    global mus_vol
+    mus_vol = min(mus_vol + 0.1, 1.0)
+    pygame.mixer.music.set_volume(mus_vol)
 
 def volume_down():
-    pygame.mixer.music.set_volume(pygame.mixer.music.get_volume() - .1)
+    """
+    Turns music volume down
+    """
+    global mus_vol
+    mus_vol = max(mus_vol - 0.1, 0.0)
+    pygame.mixer.music.set_volume(mus_vol)
