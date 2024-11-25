@@ -18,6 +18,7 @@ Revisions:
     Nov 10, 2024: Added comments - Jacob Leehy
     Nov 11, 2024: Added click sound asset to selections - Matthew Sullivan
     Nov 23, 2024: Updated GameState for tile-based level changes - Sean Hammell
+    Nov 24, 2024: Added additional states for sub menus for the options menu - Steve Gan
 Preconditions:
     - Requires Pygame and imported dependencies (`engine`, `Image`, `SoundEffect`, etc.) to function.
     - Assets like images and sounds must be correctly formatted and stored in the specified paths.
