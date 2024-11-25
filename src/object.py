@@ -81,4 +81,4 @@ class Object:
         """
         Shifts the objects vertically.
         """
-        self._rect.x += x  # Move y coord
+        self._rect.x += x  # Move x coord
