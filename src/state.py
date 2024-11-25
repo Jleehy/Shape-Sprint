@@ -116,37 +116,64 @@ class GameState:
                 engine_instance.state = GameOverState(self._level, self._cube, self._startpoint, 0)  # The user won.
             elif isinstance(obj, Spikes):
                 engine_instance.state = GameOverState(self._level, self._cube, self._startpoint, 1)  # The user lost.
-            else:
-                self.is_on_ground = True  # Assume any non-flag collision indicates the cube is on the ground.
+            elif isinstance(obj, InvertGravity):
+            # Handle gravity inversion.
+                if obj.activated == False:
+                    obj.activated = True
+                    if self._gravity > 0:  # If gravity is currently normal.
+                        self._gravity = -1
+                        self._vertical_velocity = -2  # Small nudge upwards to ensure movement.
+                    else:  # If gravity is currently inverted.
+                        self._gravity = 1
+                        self._vertical_velocity = 2  # Small nudge downwards to ensure movement.
+                    self.is_jumping = True
+                    self.is_on_ground = False
+                    print("Gravity inverted!")
 
-         # Check if the up arrow key is pressed, the player is on the ground, and the jump cooldown has elapsed
+        # Handle jumping.
         if engine_instance.keyboard.is_key_down(pygame.K_UP):
-            if self.is_on_ground and not self.is_jumping:  # Allow jumping only if on the ground and not already jumping
-                self.is_jumping = True  # Mark that the cube is now in the air
-                self.jump_frames = 0  # Reset jump frames at the start of a jump
+            if self.is_on_ground and not self.is_jumping:  # Allow jumping only if on the ground and not already jumping.
+                self.is_jumping = True  # Mark that the cube is now in the air.
+                self.jump_frames = 0  # Reset jump frames at the start of a jump.
 
-            if self.is_jumping and self.jump_frames < 5:  # Continue adjusting velocity within a frame limit
-                self.jump_frames += 1  # Increment jump frames
-                self._vertical_velocity = max(self._jump_strength, self.jump_frames / 5 * self._jump_strength)  # Set initial jump velocity.
-                self.is_jumping = True  # Set that the cube is in the air.
+            if self.is_jumping and self.jump_frames < 5:  # Continue adjusting velocity within a frame limit.
+                self.jump_frames += 1  # Increment jump frames.
+                jump_direction = -1 if self._gravity > 0 else 1  # Jump direction depends on gravity.
+                self._vertical_velocity = jump_direction * max(abs(self._jump_strength), self.jump_frames / 5 * abs(self._jump_strength))
         else:
-            if self.is_jumping and self.is_on_ground:  # Reset flags when landing
-                self.is_jumping = False  # Reset jumping state
-                self.jump_frames = 0  # Reset jump frames
-
+            if self.is_jumping and self.is_on_ground:  # Reset flags when landing.
+                self.is_jumping = False  # Reset jumping state.
+                self.jump_frames = 0  # Reset jump frames.
             
+         # Update cube position and handle collisions.
         self._surfaces_collided, self._objects_collided = self._cube.move(self._vertical_velocity, self._level)  # Move the cube.
-        if self._gravity == 1:
-            if self._surfaces_collided['bottom']:  # If the cube is colliding with something below.
+        
+        # Apply gravity and check for ground collisions.
+        if self._gravity > 0:  # Normal gravity.
+            if self._surfaces_collided['bottom']:  # If colliding with ground below.
                 self.is_on_ground = True
-                self.is_jumping = False  # Set that the cube is on the ground.
-                self._vertical_velocity = 0  # Reset the vertical velocity.
-            else: # If the cube is not colliding with something below.
-                self.is_on_ground = False # Flag if Cube is grounded.
-                self._vertical_velocity += self._gravity  # Apply gravity.
+                self.is_jumping = False
+                self._vertical_velocity = 0
+            else:  # Not colliding with ground below.
+                self.is_on_ground = False
+                self._vertical_velocity += self._gravity
 
-            if (self._surfaces_collided['top'] or self._surfaces_collided['right']):
+            if self._surfaces_collided['top']: 
+                engine_instance.state =GameOverState(self._level, self._cube, self._startpoint, 1)
+        else:  # Inverted gravity.
+            if self._surfaces_collided['top']:  # If colliding with ceiling above (inverted ground).
+                self.is_on_ground = True
+                self.is_jumping = False
+                self._vertical_velocity = 0
+            else:  # Not colliding with ceiling above.
+                self.is_on_ground = False
+                self._vertical_velocity += self._gravity
+            if self._surfaces_collided['bottom']: 
                 engine_instance.state = GameOverState(self._level, self._cube, self._startpoint, 1)
+
+        # Handle game over for collisions with spikes or out-of-bounds.
+        if self._surfaces_collided['right'] or self._surfaces_collided['left']:
+            engine_instance.state = GameOverState(self._level, self._cube, self._startpoint, 1)
                 
     def draw(self):
         self._background_image.blit(self._ctr,self._ctr) # show background

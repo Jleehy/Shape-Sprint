@@ -95,8 +95,9 @@ class Cube(Object):
         # Handle horizontal collisions.
         collision_list = level.get_collisions(self)  # Check collisions after objects have moved.
         for obj in collision_list:
-            if not isinstance(obj, CheckpointFlag) and not isinstance(obj, EndFlag):  # Skip phaseable objects.
-                if abs(self._rect.bottom - obj._rect.top) > TOLERANCE*48:
+            if not isinstance(obj, InvertGravity) and not isinstance(obj, CheckpointFlag) and not isinstance(obj, EndFlag):  # Skip phaseable objects.
+                if y > 0 and abs(self._rect.bottom - obj._rect.top) > TOLERANCE*48 or\
+                    y < 0 and abs(self._rect.bottom - obj._rect.top) < TOLERANCE*48:
                     if self._rect.right > obj._rect.left:  # Moving right into an object.
                         collision_checks['right'] = True
                         self._rect.right = obj._rect.left
@@ -105,7 +106,7 @@ class Cube(Object):
         
         # Handle vertical collisions.
         for obj in collision_list:
-            if not isinstance(obj, CheckpointFlag) and not isinstance(obj, EndFlag):  # Skip phaseable objects.
+            if not isinstance(obj, InvertGravity) and not isinstance(obj, CheckpointFlag) and not isinstance(obj, EndFlag):  # Skip phaseable objects.
                 if y >= 0 and expanded_cube_rect.bottom > obj._rect.top:
                     collision_checks['bottom'] = True
                     self._rect.bottom = obj._rect.top
@@ -179,14 +180,13 @@ class Spikes(Object): # class for spikes
         elif id == 3:
             super().__init__("assets/iceSpikes.png", x, y, TILE_SIZE, TILE_SIZE) #supers with dimensions
 
-
-
 class InvertGravity(Object):
     def __init__(self, x, y):
         """
         Initializes a gravity inverter object 
         """
-        super().__init__("assets/g1.png", x, y, 100, 100) #supers with dimensions
+        super().__init__("assets/gravity_flip.png", x, y, TILE_SIZE, TILE_SIZE * 2) #supers with dimensions
+        self.activated = False 
 
 
 """
@@ -228,92 +228,15 @@ level0 = {
         (50, 52, GROUND_LEVEL),
         (108, 124, GROUND_LEVEL)
     ],
+    "invertGravity":[
+        (22, 23, GROUND_LEVEL),
+    ],
     "end": (160, GROUND_LEVEL - 1)
 }
 
-# Level 1 layout specification.
-level1 = {
-    "id": 1, # level id
-    "ground": (-240, 40000), # ground range
-    "platforms": [
-        (3600, 750), #platforms
-        (4600, 600), #platforms
-        (5600, 750), #platforms
-        (8500, 750), #platforms
-        (8700, 750), #platforms
-        (8900, 750), #platforms
-        (10400, 550), #platforms
-        (11900, 350), #platforms
-    ],
-    "checkpoints": [(17400, 780)], #checkpoint
-    "spikes": [ #spikes
-        (1200, 1320, 780), #spikes
-        (2400, 2520, 780), #spikes
-        (3600, 5880, 780), #spikes
-        (7000, 7120, 780), #spikes
-        (8500, 11000, 780), #spikes
-        (19000, 19120, 780), #spikes
-        (21000, 21120, 780), #spikes
-        (25000, 25120, 780), #spikes
-        (29000, 29120, 780), #spikes
-
-
-    ],
-    "iceSpikes": [ #spikes
-    ],
-    "end": (35000, 780), # end flag
-}
-
-
-# Level 1 layout specification.
-level2 = {
-    "id": 2, # level id
-    "ground": (-240, 40000), # ground range
-    "platforms": [
-        (3600, 750), #platforms
-        (4400, 600), #platforms
-        (5500, 750), #platforms
-        (8300, 750), #platforms
-        (8700, 750), #platforms
-        (8900, 750), #platforms
-        (10400, 550), #platforms
-        (11900, 350), #platforms
-    ],
-    "checkpoints": [(17400, 780)], #checkpoint
-    "spikes": [ #spikes
-         ],
-    "iceSpikes": [ #spikes
-        (1200, 1320, 780), #spikes
-        (2400, 2520, 780), #spikes
-        (3600, 5660, 780), #spikes
-        (7000, 7120, 780), #spikes
-        (8500, 11000, 780), #spikes
-        (19000, 19120, 780), #spikes
-        (21000, 21120, 780), #spikes
-        (25000, 25120, 780), #spikes
-        (29000, 29120, 780), #spikes
-    ],
-    "end": (35000, 780), # end flag
-}
-# Level 1 layout specification.
-level3 = {
-    "id": 3, # level id
-    "ground": (-240, 40000), # ground range
-    "platforms": [
-    ],
-    "checkpoints": [(17400, 780)], #checkpoint
-    "spikes": [ #spikes
-         ],
-    "iceSpikes": [ #spikes
-    ],
-    "end": (35000, 780), # end flag
-}
 
 levels = { # levels
     0: level0, #level 0
-    1: level1, # level 1
-    2: level2,
-    3: level3,
 }
 
 class Level:
@@ -328,33 +251,33 @@ class Level:
         self._environment = []  # Create an empty environment list.
         self._hazards = []      # Create an empty hazards list.
 
-        for x in range(specs["ground"][0], specs["ground"][1]):  # For the range of x positions in the ground list.
-            for i in range(-1, 3):
-                if i == -1:
-                    self._environment.append(Ground(x, VERTICAL_TILES + i, self.id))                  # Create a ground tile.
-                else:
-                    self._environment.append(GroundLower(x, VERTICAL_TILES + i, self.id))                  # Create a lower ground tile.
-
-
-        for group in specs["platforms"]:                               # For each position in the platform list.
-            for x in range(group[0], group[1]):
-                self._environment.append(Platform(x, group[2]))  # Create a platform.
-
-        for checkpoint in specs["checkpoints"]:                                     # For each position in the checkpoint list.
-            self._environment.append(CheckpointFlag(checkpoint[0], checkpoint[1]))  # Create a checkpoint flag.
-
-        for group in specs["spikes"]:                      # For each position in the spikes list.
-            for x in range(group[0], group[1]):       # for the range of x positions in the spike set.
-                self._hazards.append(Spikes(x, group[2], self.id))  # Create a set of spikes.
-
-        # for IceSpike in specs["iceSpikes"]:                      # For each position in the spikes list.
-        #     for x in range(IceSpike[0], IceSpike[1], 120):       # for the range of x positions in the spike set.
-        #         self._hazards.append(IceSpikes(x, IceSpike[2]))  # Create a set of spikes.
+        if specs["ground"]:
+            for x in range(specs["ground"][0], specs["ground"][1]):  # For the range of x positions in the ground list.
+                for i in range(-1, 3):
+                    if i == -1:
+                        self._environment.append(Ground(x, VERTICAL_TILES + i, self.id))                  # Create a ground tile.
+                    else:
+                        self._environment.append(GroundLower(x, VERTICAL_TILES + i, self.id))                  # Create a lower ground tile.
+        if specs["platforms"]:
+            for group in specs["platforms"]:                               # For each position in the platform list.
+                for x in range(group[0], group[1]):
+                    self._environment.append(Platform(x, group[2]))  # Create a platform.
+        if specs["checkpoints"]:
+            for checkpoint in specs["checkpoints"]:                                     # For each position in the checkpoint list.
+                self._environment.append(CheckpointFlag(checkpoint[0], checkpoint[1]))  # Create a checkpoint flag.
+        if specs["spikes"]:
+            for group in specs["spikes"]:                      # For each position in the spikes list.
+                for x in range(group[0], group[1]):       # for the range of x positions in the spike set.
+                    self._hazards.append(Spikes(x, group[2], self.id))  # Create a set of spikes.
+        if specs["invertGravity"]:
+            for group in specs["invertGravity"]:                      # For each position in the gravity inverter list.
+                for x in range(group[0], group[1]):       # for the range of x positions in the gravity inverter set.
+                    self._environment.append(InvertGravity(x, group[2]))  # Create a set of gravity inverters.
 
         self._environment.append(EndFlag(specs["end"][0], specs["end"][1]))  # Create the end flag.
 
         for obj in self._environment + self._hazards:    # For each environment object.
-            obj.move_x(start[0] * TILE_SIZE)                            # Offset it to the start position.
+            obj.move_x(-1 * start[0] * TILE_SIZE)                             # Offset it to the start position.
 
     def draw(self):
         """
