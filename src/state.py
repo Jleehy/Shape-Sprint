@@ -170,7 +170,9 @@ class GameState:
         # Apply gravity and check for ground collisions.
         if self._gravity > 0:  # Normal gravity.
             if self._surfaces_collided['bottom']:  # If colliding with ground below.
-                self.is_on_ground = True #if on ground
+                self.is_on_ground = True #if on ground                
+                if self.is_jumping == True: # check if just jumping
+                    self._landing_sound.play() #play sound
                 self.is_jumping = False #jump is false
                 self._vertical_velocity = 0 #velocity is zero
             else:  # Not colliding with ground below.
