@@ -26,7 +26,14 @@ Revisions:
     Nov 10, 2024: Added Cube object into level.py - Mario Simental
     Nov 10, 2024: Redesign level 0 and add level 1 - Jacob Leehy
     Nov 11, 2024: Added gravity inverter object - Matthew Sullivan
+    Nov 21, 2024: Implement new backgrounds and updated assets - Jacob Leehy
     Nov 23, 2024: Updated Level and level0 to be tile-based - Sean Hammell
+    Nov 23, 2024: Update and rescale all assets - Jacob Leehy
+    Nov 24, 2024: Reimplement levels 1 and 2 - Jacob Leehy
+    Nov 24, 2024: Add spped modifier - Jacob Leehy
+    Nov 24, 2024: Add automatic asset visual handling - Jacob Leehy
+
+    
 
 Preconditions:
     - Game assets such as 'cube.png', 'ground.png', 'platform.png', 'checkpoint.png', 'end.png', and 
