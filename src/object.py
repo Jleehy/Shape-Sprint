@@ -57,7 +57,9 @@ class Object:
         self._height = height                                                  # Store the height (pixels) of the object.
         self._rect = pygame.Rect(x * TILE_SIZE, y * TILE_SIZE, width, height)  # Store the hitbox of the object.
         self._speed = int(TILE_SIZE / 5)                                       # Movement speed.
-
+        self._acceleration = 0 #var for accel
+        self._counter = 0 #counter for accel
+        
     def draw(self):
         """
         Draws the object image at the position defined by its hitbox.
@@ -74,7 +76,12 @@ class Object:
         """
         Moves the object the specified number of pixels.
         """
-        self._rect.x -= self._speed  # move the object left.  
+        if self._counter == 120: # if two secs pass
+            self._acceleration += 1 #increment accel
+            self._counter = 0 #reset coiuunter
+        self._counter += 1 #increment couner
+
+        self._rect.x -= self._speed + self._acceleration  # move the object left.  
         self._rect.y -= dy # move the object vertically
 
     def move_x(self, x):
