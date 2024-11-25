@@ -184,6 +184,8 @@ class GameState:
         else:  # Inverted gravity.
             if self._surfaces_collided['top']:  # If colliding with ceiling above (inverted ground).
                 self.is_on_ground = True #if on ground
+                if self.is_jumping == True: # check if just jumping
+                    self._landing_sound.play() #play sound
                 self.is_jumping = False #if jumping
                 self._vertical_velocity = 0 #vert velocity is 0
             else:  # Not colliding with ceiling above.
