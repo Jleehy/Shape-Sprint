@@ -15,7 +15,7 @@ Revisions:
     Nov 9, 2024: Adjust how movement is handled such that the player is tracked vertically - Jacob Leehy
     Nov 10, 2024: Add more comments - Jacob Leehy
     Nov 23, 2024: Removed acceleration and added TILE_SIZE support - Sean Hammell
-    Nov 24, 2024: Reimplement acceleration - Jacob Leehy
+    Nov 24, 2024: Reimplement acceleration and add comments- Jacob Leehy
 Preconditions:
     - Requires the Pygame library for rendering and collision detection.
     - `image.py` module must define an `Image` class for handling image loading and rendering.
