@@ -234,9 +234,80 @@ level0 = {
     "end": (160, GROUND_LEVEL - 1)
 }
 
+# Level 1 layout specification.
+level1 = {
+    "id": 1, # level id
+   "ground": (-10, 200),
+    "platforms": [
+        (20, 28, GROUND_LEVEL - 2),
+        (110, 112, GROUND_LEVEL - 2),
+        (120, 122, GROUND_LEVEL - 4),
+    ],
+    "checkpoints": [
+        (80, GROUND_LEVEL - 1)
+    ],
+    "spikes":[
+        (40, 42, GROUND_LEVEL),
+        (50, 52, GROUND_LEVEL),
+        (108, 124, GROUND_LEVEL)
+    ],
+    "invertGravity":[
+        (22, 23, GROUND_LEVEL),
+    ],
+    "end": (160, GROUND_LEVEL - 1)
+}
+
+
+# Level 1 layout specification.
+level2 = {
+    "id": 2, # level id
+    "ground": (-10, 200),
+    "platforms": [
+        (20, 28, GROUND_LEVEL - 2),
+        (110, 112, GROUND_LEVEL - 2),
+        (120, 122, GROUND_LEVEL - 4),
+    ],
+    "checkpoints": [
+        (80, GROUND_LEVEL - 1)
+    ],
+    "spikes":[
+        (40, 42, GROUND_LEVEL),
+        (50, 52, GROUND_LEVEL),
+        (108, 124, GROUND_LEVEL)
+    ],
+    "invertGravity":[
+        (22, 23, GROUND_LEVEL),
+    ],
+    "end": (160, GROUND_LEVEL - 1)
+}
+# Level 1 layout specification.
+level3 = {
+    "id": 3, # level id
+    "ground": (-10, 200),
+    "platforms": [
+        (20, 28, GROUND_LEVEL - 2),
+        (110, 112, GROUND_LEVEL - 2),
+        (120, 122, GROUND_LEVEL - 4),
+    ],
+    "checkpoints": [
+        (80, GROUND_LEVEL - 1)
+    ],
+    "spikes":[
+        (40, 42, GROUND_LEVEL),
+        (50, 52, GROUND_LEVEL),
+        (108, 124, GROUND_LEVEL)
+    ],
+    "invertGravity":[
+        (22, 23, GROUND_LEVEL),
+    ],
+    "end": (160, GROUND_LEVEL - 1)
+}
 
 levels = { # levels
     0: level0, #level 0
+    1: level1, # level 1
+    2: level2,
+    3: level3,
 }
 
 class Level:

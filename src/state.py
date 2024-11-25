@@ -270,7 +270,7 @@ class LevelSelectMenuState(BaseMenuState):
             engine_instance.state = OpeningMenuState(self.last_key_time) # return to opening menu
         else:
             self.select_sound.play() # Play click1 sound on selection
-            engine_instance.state = GameState(self.select_option)  # Start at the selected level
+            engine_instance.state = GameState(self.selected_option)  # Start at the selected level
 
 # Main menu state for in-game pause menu.
 class MainMenuState(BaseMenuState):
