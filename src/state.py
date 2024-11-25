@@ -138,8 +138,10 @@ class GameState:
 
             if self.is_jumping and self.jump_frames < 5:  # Continue adjusting velocity within a frame limit.
                 self.jump_frames += 1  # Increment jump frames.
-                jump_direction = -1 if self._gravity > 0 else 1  # Jump direction depends on gravity.
-                self._vertical_velocity = jump_direction * max(abs(self._jump_strength), self.jump_frames / 5 * abs(self._jump_strength))
+                jump_direction = 1 if self._gravity > 0 else -1  # Jump direction depends on gravity.
+               
+                self._vertical_velocity = jump_direction * max(self._jump_strength, self.jump_frames / 5 * self._jump_strength)
+                print(self._vertical_velocity)
         else:
             if self.is_jumping and self.is_on_ground:  # Reset flags when landing.
                 self.is_jumping = False  # Reset jumping state.
