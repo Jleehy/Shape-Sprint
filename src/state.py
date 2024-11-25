@@ -20,6 +20,7 @@ Revisions:
     Nov 23, 2024: Updated GameState for tile-based level changes - Sean Hammell
     Nov 24, 2024: Add help menu state - Jacob Leehy
     Nov 24, 2024: Patch checkpoint bugs - Jacob Leehy
+    Nov 24, 2024: Add speed modifier handling - Jacob Leehy
 Preconditions:
     Requires Pygame and imported dependencies (engine, Image, SoundEffect, etc.) to function.
 Postconditions:
