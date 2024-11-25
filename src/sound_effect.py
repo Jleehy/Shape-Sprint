@@ -29,6 +29,8 @@ Known Faults:
 
 import pygame
 
+sfx_vol = .05
+
 
 class SoundEffect:
     def __init__(self, file):
@@ -37,9 +39,25 @@ class SoundEffect:
         """
         # Load the sound file.
         self._sound = pygame.mixer.Sound(file)
+        self._sound.set_volume(sfx_vol)
+
 
     def play(self):
         """
         Plays the SoundEffect.
         """
         pygame.mixer.Sound.play(self._sound)
+
+    def update_volume(self):
+        """
+        Updates the volume of this sound effect.
+        """
+        self._sound.set_volume(sfx_vol)
+
+def sfx_volume_up():
+    global sfx_vol
+    sfx_vol = min(sfx_vol + 0.1, 1.0)  # Cap at 1.0
+
+def sfx_volume_down():
+    global sfx_vol
+    sfx_vol = max(sfx_vol - 0.1, 0.0)  # Minimum 0.0
