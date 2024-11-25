@@ -46,7 +46,6 @@ class Keyboard:
 
         }
 
-
     #def is_key_down(self, key):
         """
         Returns if a key is down.
