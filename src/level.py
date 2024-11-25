@@ -216,7 +216,7 @@ level0 = {
     "id": 0,
     "ground": (-10, 200),
     "platforms": [
-        (20, 28, GROUND_LEVEL - 2),
+        (20, 50, GROUND_LEVEL - 10),
         (110, 112, GROUND_LEVEL - 2),
         (120, 122, GROUND_LEVEL - 4),
     ],
