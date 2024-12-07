@@ -32,8 +32,7 @@ Revisions:
     Nov 24, 2024: Reimplement levels 1 and 2 - Jacob Leehy
     Nov 24, 2024: Add spped modifier - Jacob Leehy
     Nov 24, 2024: Add automatic asset visual handling - Jacob Leehy
-
-    
+    Dec 07, 2024: Moved screen resolution constants to engine.py - Sean Hammell
 
 Preconditions:
     - Game assets such as 'cube.png', 'ground.png', 'platform.png', 'checkpoint.png', 'end.png', and 
@@ -69,10 +68,8 @@ Known Faults:
 
 """
 
+from engine import SCREEN_WIDTH, SCREEN_HEIGHT
 from object import Object, TILE_SIZE # import obj and tile size
-
-SCREEN_WIDTH = 1600 #set screen width
-SCREEN_HEIGHT = 800 # set screen height
 
 TOLERANCE = 1 # set tolerance
 
