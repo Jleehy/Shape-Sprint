@@ -417,47 +417,53 @@ level4 = {
     "id": 4,  # id
     "ground": (-10, 600),  # Extended ground for a longer level
     "platforms": [  # Combined platforms from Levels 1, 3, and 4
-        (50, 120, GROUND_LEVEL - 8),
-        (68, 76, GROUND_LEVEL - 1),
-        (110, 124, GROUND_LEVEL - 2),
-        (130, 154, GROUND_LEVEL - 2),
-        (158, 171, GROUND_LEVEL - 4),
-        (175, 220, GROUND_LEVEL - 6),
-        (228, 270, GROUND_LEVEL - 8),
-        (282, 350, GROUND_LEVEL - 6),
-        (390, 460, GROUND_LEVEL - 4),
+        (50, 120, GROUND_LEVEL - 8), #platforms
+        (110, 124, GROUND_LEVEL - 2), #platforms
+        (130, 154, GROUND_LEVEL - 2), #platforms
+        (158, 171, GROUND_LEVEL - 4), #platforms
+        (175, 220, GROUND_LEVEL - 6), #platforms
+        (228, 270, GROUND_LEVEL - 8), #platforms
+        (390, 440, GROUND_LEVEL - 5), #platforms
     ],
     "checkpoints": [  # Spread-out checkpoints
-        (100, GROUND_LEVEL - 1),
-        (250, GROUND_LEVEL - 1),
-        (450, GROUND_LEVEL - 1),
+        (250, GROUND_LEVEL - 1), #checkpoints
+        (440, GROUND_LEVEL - 1), #checkpoints
     ],
     "spikes": [  # Spikes from all levels merged
-        (20, 22, GROUND_LEVEL),
-        (40, 42, GROUND_LEVEL),
-        (50, 52, GROUND_LEVEL),
-        (60, 200, GROUND_LEVEL),
-        (100, 124, GROUND_LEVEL),
-        (140, 150, GROUND_LEVEL),
-        (190, 194, GROUND_LEVEL - 3),
-        (240, 241, GROUND_LEVEL),
-        (260, 261, GROUND_LEVEL),
-        (330, 331, GROUND_LEVEL),
-        (390, 391, GROUND_LEVEL),
-        (410, 411, GROUND_LEVEL),
-        (430, 440, GROUND_LEVEL),
-        (480, 485, GROUND_LEVEL),
+        (20, 22, GROUND_LEVEL), #spikes
+        (40, 42, GROUND_LEVEL), #spikes
+        (50, 52, GROUND_LEVEL), #spikes
+        (60, 200, GROUND_LEVEL), #spikes
+        (100, 124, GROUND_LEVEL), #spikes
+        (140, 150, GROUND_LEVEL), #spikes
+        (140, 141, GROUND_LEVEL - 3), #spikes
+        (190, 193, GROUND_LEVEL - 7), #spikes
+        (210, 211, GROUND_LEVEL - 7), #spikes
+        (228, 260, GROUND_LEVEL - 9), #spikes
+        (240, 241, GROUND_LEVEL), #spikes
+        (330, 331, GROUND_LEVEL), #spikes
+        (390, 391, GROUND_LEVEL), #spikes
+        (420, 421, GROUND_LEVEL), #spikes
+        (460, 470, GROUND_LEVEL), #spikes
+        (490, 495, GROUND_LEVEL), #spikes
+        (500, 501, GROUND_LEVEL), #spikes
+        (520, 521, GROUND_LEVEL), #spikes
+        (530, 531, GROUND_LEVEL), #spikes
+        (550, 555, GROUND_LEVEL), #spikes
+
     ],
     "invertGravity": [  # Invert gravity from Levels 3 and 4
-        (45, 46, GROUND_LEVEL),
-        (70, 71, GROUND_LEVEL - 7),
-        (110, 111, GROUND_LEVEL - 7),
-        (200, 201, GROUND_LEVEL),
+        (45, 46, GROUND_LEVEL), #invert grav
+        (70, 71, GROUND_LEVEL - 7), #invert grav
+        (85, 86, GROUND_LEVEL - 7), #invert grav
+        (110, 111, GROUND_LEVEL - 7), #invert grav
+        (200, 201, GROUND_LEVEL), #invert grav
     ],
     "speed": [  # Speed zones from Levels 2 and 3
-        (40, 150, GROUND_LEVEL),
-        (250, 350, GROUND_LEVEL),
-        (400, 460, GROUND_LEVEL),
+        (40, 150, GROUND_LEVEL), #speed
+        (158, 171, GROUND_LEVEL - 5), #speed
+        (250, 350, GROUND_LEVEL), #speed
+        (400, 460, GROUND_LEVEL), #speed
     ],
     "end": (580, GROUND_LEVEL - 1),  # Final flag position
 }
