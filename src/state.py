@@ -148,7 +148,7 @@ class GameState:
             
             elif isinstance(obj, SpeedBoost): #if speed boost
             # Handle gravity inversion.
-                    self._cube.move(self._vertical_velocity, self._level) #move again - doubles speed
+                    self._cube.move(self._vertical_velocity, self._gravity, self._level) #move again - doubles speed
                     print("Speed") #print test
 
         # Handle jumping.
@@ -169,7 +169,7 @@ class GameState:
                 self.jump_frames = 0  # Reset jump frames.
             
          # Update cube position and handle collisions.
-        self._surfaces_collided, self._objects_collided = self._cube.move(self._vertical_velocity, self._level)  # Move the cube.
+        self._surfaces_collided, self._objects_collided = self._cube.move(self._vertical_velocity, self._gravity, self._level)  # Move the cube.
         
         # Apply gravity and check for ground collisions.
         if self._gravity > 0:  # Normal gravity.
@@ -186,7 +186,6 @@ class GameState:
                 engine_instance.state =GameOverState(self._level, self._cube, self._startpoint, 1) #end game
                 
         else:  # Inverted gravity.
-            print(self._surfaces_collided['top'])
             if self._surfaces_collided['top']:  # If colliding with ceiling above (inverted ground).
                 self.is_on_ground = True #if on ground
                 if self.is_jumping == True: # check if just jumping

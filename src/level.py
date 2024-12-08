@@ -71,7 +71,7 @@ Known Faults:
 from engine import SCREEN_WIDTH, SCREEN_HEIGHT
 from object import Object, TILE_SIZE # import obj and tile size
 
-TOLERANCE = 1 # set tolerance
+TOLERANCE = 2 # set tolerance
 
 HORIZONTAL_TILES = int(SCREEN_WIDTH / TILE_SIZE) - 1 # set horizinal tiles
 VERTICAL_TILES = int(SCREEN_HEIGHT / TILE_SIZE) - 1 # set vert tiles
@@ -87,7 +87,7 @@ class Cube(Object):
         """
         super().__init__("assets/cube.png", 4, GROUND_LEVEL, TILE_SIZE, TILE_SIZE)  # super's init
 
-    def move(self, y, level):
+    def move(self, y, gravity, level):
         """
         Updates the Cube's state and handles collisions with moving level objects.
         """
@@ -95,7 +95,6 @@ class Cube(Object):
         collides_with = []  # List of objects the Cube collides with.
         
         expanded_cube_rect = self._rect.inflate(TOLERANCE, TOLERANCE) # expand cube rect
-
         # Move all level objects first.
         for obj in level._environment: # iterate over objs
             obj.scroll_object(y) # scroll objs
@@ -105,8 +104,8 @@ class Cube(Object):
         collision_list = level.get_collisions(self)  # Check collisions after objects have moved.
         for obj in collision_list: # iterate over collisions
             if not isinstance(obj, InvertGravity) and not isinstance(obj, CheckpointFlag) and not isinstance(obj, EndFlag) and not isinstance(obj, SpeedBoost):  # Skip phaseable objects.
-                if y > 0 and abs(self._rect.bottom - obj._rect.top) > TOLERANCE*48 or\
-                    y < 0 and abs(self._rect.bottom - obj._rect.top) < TOLERANCE*48: # check for needed sdjustments and adjust as needed
+                if y > 0 and abs(expanded_cube_rect.bottom - obj._rect.top) > TOLERANCE*48 or\
+                    y < 0 and abs(expanded_cube_rect.bottom - obj._rect.top) < TOLERANCE*48: # check for needed sdjustments and adjust as needed
                     if self._rect.right > obj._rect.left:  # Moving right into an object.
                         collision_checks['right'] = True # set right collision
                         self._rect.right = obj._rect.left # move rect to left
@@ -116,14 +115,22 @@ class Cube(Object):
         # Handle vertical collisions.
         for obj in collision_list: # iterate over objects in collision list
             if not isinstance(obj, InvertGravity) and not isinstance(obj, CheckpointFlag) and not isinstance(obj, EndFlag) and not isinstance(obj, SpeedBoost):  # Skip phaseable objects.
-                if y >= 0 and expanded_cube_rect.bottom > obj._rect.top: # if y is greater than 0 aand bottom greater than top
-                    collision_checks['bottom'] = True # set bottom to true
-                    self._rect.bottom = obj._rect.top # set bottom to rect top
-                elif expanded_cube_rect.top < obj._rect.bottom: # if expanded cube less than bottom
-                    collision_checks['top'] = True # set collision to true
-                    self._rect.top = obj._rect.bottom # set rect top to bottom
-            collides_with.append(obj) # append to collisions
+                if gravity == 1 and y >= 0 and expanded_cube_rect.bottom > obj._rect.top:  # Moving down with gravity
+                    collision_checks['bottom'] = True  # Set bottom collision to true
+                    self._rect.bottom = obj._rect.top  # Align bottom of self to top of obj
+                elif gravity == -1 and y <= 0 and expanded_cube_rect.top < obj._rect.bottom:  # Moving up with gravity
+                    collision_checks['top'] = True  # Set top collision to true
+                    self._rect.top = obj._rect.bottom  # Align top of self to bottom of obj
+                elif y > 0 and expanded_cube_rect.bottom > obj._rect.top:  # General case: moving down
+                    collision_checks['bottom'] = True  # Set bottom collision to true
+                    self._rect.bottom = obj._rect.top  # Align bottom of self to top of obj
+                elif y < 0 and expanded_cube_rect.top < obj._rect.bottom:  # General case: moving up
+                    collision_checks['top'] = True  # Set top collision to true
+                    self._rect.top = obj._rect.bottom  # Align top of self to bottom of obj
 
+                collides_with.append(obj)  # Append collided object to the list
+
+        print(collision_list, collision_checks)
         return collision_checks, collides_with # return the lists
 
 class Ground(Object): #class for ground
