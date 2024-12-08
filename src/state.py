@@ -108,6 +108,8 @@ class GameState:
             self._background_image = Image("assets/background3.png")  # Load the background
         elif level_id == 3:
             self._background_image = Image("assets/background4.png")  # Load the background
+        elif level_id == 4:
+            self._background_image = Image("assets/background5.png")  # Load the background
 
         self._ctr = 0 # counter
         self.jump_frames = 0 # how many frames jump key was held down for
@@ -142,6 +144,8 @@ class GameState:
                     self.is_jumping = True #jumping is true
                     self.is_on_ground = False #jumping is false
                     print("Gravity inverted!") #test label
+            
+            
             elif isinstance(obj, SpeedBoost): #if speed boost
             # Handle gravity inversion.
                     self._cube.move(self._vertical_velocity, self._level) #move again - doubles speed
@@ -178,10 +182,11 @@ class GameState:
             else:  # Not colliding with ground below.
                 self.is_on_ground = False #on ground false
                 self._vertical_velocity += self._gravity # increment vert velocity
-
             if self._surfaces_collided['top']: #if top collide
                 engine_instance.state =GameOverState(self._level, self._cube, self._startpoint, 1) #end game
+                
         else:  # Inverted gravity.
+            print(self._surfaces_collided['top'])
             if self._surfaces_collided['top']:  # If colliding with ceiling above (inverted ground).
                 self.is_on_ground = True #if on ground
                 if self.is_jumping == True: # check if just jumping
@@ -243,7 +248,7 @@ class BaseMenuState(State):
         for index, option in enumerate(self.options): # Iterate through all possible options.
             color = (240, 86, 86) if self.selected_option == index else (0, 0, 0) # Change button color if hovered.
             option_surface = self.font_small.render(option, True, color) # Render the option as a button.
-            engine_instance.screen.blit(option_surface, (625, 400 + index * 75)) # Draw the button.
+            engine_instance.screen.blit(option_surface, (625, 400 + index * 65)) # Draw the button.
 
 # Opening menu state with custom select_option logic.
 class OpeningMenuState(BaseMenuState):
@@ -316,7 +321,7 @@ class KeysMenuState(BaseMenuState):
 # Level select menu state with custom select_option logic.
 class LevelSelectMenuState(BaseMenuState):
     def __init__(self, last_key_time): # init
-        options = ["Back", "Level 1", "Level 2", "Level 3", "Level 4"] # options list
+        options = ["Back", "Level 1", "Level 2", "Level 3", "Level 4", "Level 5"] # options list
         super().__init__(options, "assets/levelMenuBackground.png", last_key_time) # super w/ info
 
     def select_option(self): # selection list
@@ -335,6 +340,9 @@ class LevelSelectMenuState(BaseMenuState):
         elif self.selected_option == 4: # if 4
             self.select_sound.play() # Play click1 sound on selection
             engine_instance.state = GameState(3)  # Start at Level 4 (3)
+        elif self.selected_option == 5: # if 4
+            self.select_sound.play() # Play click1 sound on selection
+            engine_instance.state = GameState(4)  # Start at Level 4 (3)
 
 # Main menu state for in-game pause menu.
 class MainMenuState(BaseMenuState):
