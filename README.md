@@ -1,5 +1,5 @@
 # Shape-Sprint
-This is our EECS 581 capstone project.
+This is our EECS 581 term project.
 
 ## Prerequisites
 
