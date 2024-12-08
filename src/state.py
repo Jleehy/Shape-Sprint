@@ -357,7 +357,7 @@ class MainMenuState(BaseMenuState):
             engine_instance.state = self.previous_state  # Resume the game
         elif self.selected_option == 1: # if 1
             self.select_sound.play() # Play click1 sound on selection
-            engine_instance.state = GameState()  # Restart the game
+            engine_instance.state = GameState(self.previous_state._level.id)  # Restart the game
         elif self.selected_option == 2: # if 1
             self.select_sound.play() # Play click1 sound on selection
             engine_instance.state = HelpMenuState(self.last_key_time)  # Restart the game
