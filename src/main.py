@@ -32,6 +32,7 @@ Revisions:
     Nov 10, 2024: Patch checkpoint bugs and implement speed retention between checkpoints - Jacob Leehy
     Nov 10, 2024: Added volume up and down option to option menu - Steve Gan
     Nov 10, 2024: Split up functionality from test.py into main.py and into their respective modules. - Mario Simental
+    Dec 08, 2024: Add new assets for level 5 - Jacob Leehy
 Preconditions:
     - Pygame and required custom modules (audio, engine, image, sound_effect) are installed and accessible.
     - Assets such as images and sound files are located in the specified file paths.
