@@ -98,7 +98,7 @@ class GameState:
         self.is_on_ground = False # Flag if Cube is grounded.
 
         # Load instructions asset
-        self._instructions_image = Image("assets/instructions.png")  # Load the instructions image.
+        #self._instructions_image = Image("assets/instructions.png")  # Load the instructions image.
         self._settings = Image("assets/settings.png")                # Load the settings image.
         if level_id == 0:    
             self._background_image = Image("assets/background.png")  # Load the background
@@ -205,7 +205,7 @@ class GameState:
     def draw(self): #func to draw everything
         self._background_image.blit(self._ctr,self._ctr) # show background
         self._ctr -= 1 #counter
-        self._instructions_image.blit(10, 10)  # Adjust the x, y position as needed
+        #self._instructions_image.blit(10, 10)  # Adjust the x, y position as needed
         self._settings.blit(1500, 10)  # Adjust the x, y position as needed
         self._cube.draw() # draw cube
         self._level.draw() # draw level
