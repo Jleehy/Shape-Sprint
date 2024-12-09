@@ -22,6 +22,7 @@ Revisions:
     Nov 24, 2024: Patch checkpoint bugs - Jacob Leehy
     Nov 24, 2024: Add speed modifier handling - Jacob Leehy
     Nov 24, 2024: Added additional states for sub menus for the options menu - Steve Gan
+    Dec 08, 2024: Implement structures needed for level 5 - Jacob Leehy
 Preconditions:
     - Requires Pygame and imported dependencies (`engine`, `Image`, `SoundEffect`, etc.) to function.
     - Assets like images and sounds must be correctly formatted and stored in the specified paths.
