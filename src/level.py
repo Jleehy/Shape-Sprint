@@ -33,6 +33,7 @@ Revisions:
     Nov 24, 2024: Add spped modifier - Jacob Leehy
     Nov 24, 2024: Add automatic asset visual handling - Jacob Leehy
     Dec 07, 2024: Moved screen resolution constants to engine.py - Sean Hammell
+    Dec 08, 2024: Implement level 5 - Jacob Leehy
 
 Preconditions:
     - Game assets such as 'cube.png', 'ground.png', 'platform.png', 'checkpoint.png', 'end.png', and 
